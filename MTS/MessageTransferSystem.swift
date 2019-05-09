@@ -9,15 +9,22 @@
 import Foundation
 import Network
 
+enum MTSType: Int{
+    case Request = 1
+    case Reply   = 2
+}
 struct MTSMessage : Codable {
-    var Route: String
+    var Route: Int
+    var MessageType: Int
     var Json: String
     
-    init(route: String, json: String) {
-        Route = route
+    init(route: MTSRequest, messageType: MTSType, json: String) {
+        Route = route.rawValue
+        MessageType = messageType.rawValue
         Json = json
     }
 }
+
 
 class MTSServer {
     var ListenerPort: NWEndpoint.Port
@@ -86,25 +93,30 @@ class MTSClient {
     var Url: URL
     var Hostname: String?
     var Port: UInt16?
-    var MtsReceiver: (_ receive: String) -> Void
-    var useTLS: Bool = false
+    var MtsReceiver: (_ receive: MTSMessage) -> Void
+    
+    var useTLS = false
     var ClientCertificate: Data?
+    
     var ProxyURL: URL?
     var ProxyUser: String?
     var ProxyPassword: String?
     
     var connection: NWConnection?
-    var connected: Bool = false
+    var connected = false
     
-    var buffer: Data = Data()
-    var expected: UInt32 = 0
+    let await = DispatchSemaphore(value: 0)
+    var waiting = false
     
-    init(url: URL, mtsReceiver: @escaping (_ receive: String) -> Void) {
+    var buffer = Data()
+    var expected = 0
+    
+    init(url: URL, mtsReceiver: @escaping (_ receive: MTSMessage) -> Void) {
         Url = url
         MtsReceiver = mtsReceiver
     }
     
-    init(hostname: String, port: UInt16, mtsReceiver: @escaping (_ receive: String) -> Void) {
+    init(hostname: String, port: UInt16, mtsReceiver: @escaping (_ receive: MTSMessage) -> Void) {
         Hostname = hostname
         Port = port
         Url = URL(string: "\(Hostname!):\(Port!)")!
@@ -167,17 +179,27 @@ class MTSClient {
                 // … process the data …
                 print("did receive \(data.count) \(self.expected) bytes")
                 if (self.buffer.count == 0 && self.expected == 0) {
-                    self.expected  = UInt32(data.removeFirst())
-                    self.expected |= UInt32(data.removeFirst()) << 8
-                    self.expected |= UInt32(data.removeFirst()) << 16
-                    self.expected |= UInt32(data.removeFirst()) << 24
+                    self.expected  = Int(data.removeFirst())
+                    self.expected |= Int(data.removeFirst()) << 8
+                    self.expected |= Int(data.removeFirst()) << 16
+                    self.expected |= Int(data.removeFirst()) << 24
                     print("expected: \(self.expected) bytes")
                 }
                 self.buffer.append(data)
                 print("have \(self.buffer.count) expected \(self.expected)")
                 if (self.buffer.count == self.expected) {
-                    let s = String(data: self.buffer, encoding: .utf8)
-                    self.MtsReceiver(s!)
+                    let jsonDecoder = JSONDecoder()
+                    var mtsMessage: MTSMessage?
+                    do {
+                        mtsMessage = try jsonDecoder.decode(MTSMessage.self, from: self.buffer)
+                    } catch {
+                        print("receive json convert error")
+                    }
+                    if (self.waiting && MTSType(rawValue: mtsMessage!.MessageType) == .Reply) {
+                        self.waitReceiver(mtsMessage!)
+                    } else {
+                        self.MtsReceiver(mtsMessage!)
+                    }
                     self.buffer = Data()
                     self.expected = 0
                 }
@@ -218,6 +240,39 @@ class MTSClient {
             }
             print("processed")
         })))
+    }
+    
+    var obj: AnyObject?
+    func sendAwait(_ data: Data) -> AnyObject {
+        waiting = true
+        send(data);
+        await.wait()
+        return obj!
+    }
+    func waitReceiver(_ mtsMessage: MTSMessage) {
+        print("mtsMessage \(mtsMessage)")
+        let jsonDecoder = JSONDecoder()
+        print(mtsMessage.Route)
+        switch MTSRequest(rawValue: mtsMessage.Route)! {
+        case .Login:
+            do {
+                obj = try jsonDecoder.decode(RMSLoginResponse.self, from: mtsMessage.Json.data(using: .utf8)!) as AnyObject
+            } catch {
+                print("RMSLoginResponse json convert error")
+            }
+            break
+        case .OplCommands:
+            do {
+                obj = try jsonDecoder.decode(OPLCommands.self, from: mtsMessage.Json.data(using: .utf8)!) as AnyObject
+            } catch {
+                print("OPLCommands json convert error")
+            }
+            break
+        default:
+            break
+        }
+        waiting = false
+        await.signal()
     }
     
     func sendEndOfStream() {

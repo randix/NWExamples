@@ -17,3 +17,7 @@ struct Login : Codable {
         Password = password
     }
 }
+
+struct RMSLoginResponse : Codable {
+    var ClientCertificate: Data?
+}

@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		A4313E7A2283DB97001644BE /* Login.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4313E792283DB97001644BE /* Login.swift */; };
 		A4313E7C2283DB9F001644BE /* MessageTransferSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4313E7B2283DB9F001644BE /* MessageTransferSystem.swift */; };
-		A4313E7E2283E50C001644BE /* RMSLoginResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4313E7D2283E50C001644BE /* RMSLoginResponse.swift */; };
 		A4313E802283E552001644BE /* RoomConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4313E7F2283E552001644BE /* RoomConfig.swift */; };
+		A4313E8222845131001644BE /* MTSRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4313E8122845131001644BE /* MTSRequest.swift */; };
 		A4E4FB1E2277FE5400A00744 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E4FB1D2277FE5400A00744 /* AppDelegate.swift */; };
 		A4E4FB202277FE5400A00744 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E4FB1F2277FE5400A00744 /* ViewController.swift */; };
 		A4E4FB252277FE5900A00744 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A4E4FB242277FE5900A00744 /* Assets.xcassets */; };
@@ -20,8 +20,8 @@
 /* Begin PBXFileReference section */
 		A4313E792283DB97001644BE /* Login.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Login.swift; sourceTree = "<group>"; };
 		A4313E7B2283DB9F001644BE /* MessageTransferSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageTransferSystem.swift; sourceTree = "<group>"; };
-		A4313E7D2283E50C001644BE /* RMSLoginResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RMSLoginResponse.swift; sourceTree = "<group>"; };
 		A4313E7F2283E552001644BE /* RoomConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomConfig.swift; sourceTree = "<group>"; };
+		A4313E8122845131001644BE /* MTSRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTSRequest.swift; sourceTree = "<group>"; };
 		A4E4FB1A2277FE5400A00744 /* MTS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MTS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4E4FB1D2277FE5400A00744 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A4E4FB1F2277FE5400A00744 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -46,6 +46,7 @@
 			children = (
 				A4313E7B2283DB9F001644BE /* MessageTransferSystem.swift */,
 				A4313E782283DB85001644BE /* Entities */,
+				A4313E8122845131001644BE /* MTSRequest.swift */,
 			);
 			name = MessageTransferSystem;
 			sourceTree = "<group>";
@@ -54,7 +55,6 @@
 			isa = PBXGroup;
 			children = (
 				A4313E792283DB97001644BE /* Login.swift */,
-				A4313E7D2283E50C001644BE /* RMSLoginResponse.swift */,
 				A4313E7F2283E552001644BE /* RoomConfig.swift */,
 			);
 			name = Entities;
@@ -168,11 +168,11 @@
 			files = (
 				A4E4FB202277FE5400A00744 /* ViewController.swift in Sources */,
 				A4E4FB3A227A903000A00744 /* OPL.swift in Sources */,
+				A4313E8222845131001644BE /* MTSRequest.swift in Sources */,
 				A4E4FB1E2277FE5400A00744 /* AppDelegate.swift in Sources */,
 				A4313E7C2283DB9F001644BE /* MessageTransferSystem.swift in Sources */,
 				A4313E7A2283DB97001644BE /* Login.swift in Sources */,
 				A4313E802283E552001644BE /* RoomConfig.swift in Sources */,
-				A4313E7E2283E50C001644BE /* RMSLoginResponse.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

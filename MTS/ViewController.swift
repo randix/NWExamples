@@ -31,7 +31,7 @@ class ViewController: UIViewController {
         self.view.addSubview(button)
         
         button = UIButton(frame: CGRect(x: 30, y: 200, width: 200, height: 50))
-        button.backgroundColor = .red
+        button.backgroundColor = .green
         button.setTitle("GetOplCommands", for: .normal)
         button.addTarget(self, action: #selector(buttonGetOplCommands), for: .touchUpInside)
         self.view.addSubview(button)
@@ -43,9 +43,9 @@ class ViewController: UIViewController {
         self.view.addSubview(button)
         
         button = UIButton(frame: CGRect(x: 20, y: 300, width: 210, height: 50))
-        button.backgroundColor = .red
-        button.setTitle("Connect RMSRoomNode", for: .normal)
-        button.addTarget(self, action: #selector(buttonConnectRMSRmNd), for: .touchUpInside)
+        button.backgroundColor = .green
+        button.setTitle("GetOplCommands2", for: .normal)
+        button.addTarget(self, action: #selector(buttonGetOplCommands2), for: .touchUpInside)
         self.view.addSubview(button)
         
         button = UIButton(frame: CGRect(x: 240, y: 300, width: 100, height: 50))
@@ -73,7 +73,7 @@ class ViewController: UIViewController {
         } catch {
             print("json convert error")
         }
-        let mtsMessage = MTSMessage(route:"Login", json:json)
+        let mtsMessage = MTSMessage(route:.Login, messageType:.Request, json:json)
         do {
             let jsonData = try jsonEncoder.encode(mtsMessage)
             json = String(data: jsonData, encoding: String.Encoding.utf8)!
@@ -88,7 +88,7 @@ class ViewController: UIViewController {
     {
         let jsonEncoder = JSONEncoder()
         var json : String = ""
-        let mtsMessage = MTSMessage(route:"GetOplCommands", json:"")
+        let mtsMessage = MTSMessage(route:.OplCommands, messageType:.Request, json:"")
         do {
             let jsonData = try jsonEncoder.encode(mtsMessage)
             json = String(data: jsonData, encoding: String.Encoding.utf8)!
@@ -97,6 +97,25 @@ class ViewController: UIViewController {
         }
         print(json)
         client!.send(json.data(using: String.Encoding.utf8)!)
+    }
+    
+    @objc func buttonGetOplCommands2(sender: UIButton!)
+    {
+        let jsonEncoder = JSONEncoder()
+        var json : String = ""
+        let mtsMessage = MTSMessage(route:.OplCommands, messageType:.Request, json:"")
+        do {
+            let jsonData = try jsonEncoder.encode(mtsMessage)
+            json = String(data: jsonData, encoding: String.Encoding.utf8)!
+        } catch {
+            print("json convert error")
+        }
+        print(json)
+        let oplCommands = client!.sendAwait(json.data(using: String.Encoding.utf8)!) as! OPLCommands
+        for (key, value) in oplCommands.OPLLists {
+            print("\(key) -> \(value)")
+        }
+        print("got synchronously")
     }
     
     @objc func buttonEnrollRMS(sender: UIButton!)
@@ -113,35 +132,28 @@ class ViewController: UIViewController {
         print("enroll RMSRmNd (with OPL)")
     }
     
-    func mtsReceiver(_ json: String) {
-        print("data \(json)")
+    func mtsReceiver(_ mtsMessage: MTSMessage) {
+        print("mtsMessage \(mtsMessage)")
         let jsonDecoder = JSONDecoder()
-        var mtsMessage: MTSMessage?
-        do {
-            mtsMessage = try jsonDecoder.decode(MTSMessage.self, from: json.data(using: .utf8)!)
-        } catch {
-            print("json convert error")
-        }
-        print(mtsMessage!.Route)
-        switch mtsMessage!.Route {
-        case "RMSLoginResponse":
+
+        print(mtsMessage.Route)
+        switch MTSRequest(rawValue: mtsMessage.Route)! {
+        case .Login:
             break
-        case "OplCommandsResponse":
+        case .OplCommands:
             do {
-                let oplCommands = try jsonDecoder.decode(OPLCommands.self, from: mtsMessage!.Json.data(using: .utf8)!)
+                let oplCommands = try jsonDecoder.decode(OPLCommands.self, from: mtsMessage.Json.data(using: .utf8)!)
             
                 for (key, value) in oplCommands.OPLLists {
                     print("\(key) -> \(value)")
                 }
-            
             } catch {
-                print("json convert error")
+                print("OPLCommands json convert error")
             }
             break
         default:
             break
         }
-        
     }
 }
 
