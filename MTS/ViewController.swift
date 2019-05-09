@@ -10,23 +10,17 @@ import UIKit
 import Network
 
 class ViewController: UIViewController {
-
-    var client: MTSClient?
     
-//    required init?(coder aDecoder: NSCoder) {
-//        super.init(coder: aDecoder)
-//        //fatalError("init(coder:) has not been implemented")
-//    }
+    var client: MTSClient?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         self.view.backgroundColor = .white
         
-        // I'm a RMSServer
         var button = UIButton(frame: CGRect(x: 30, y: 100, width: 200, height: 50))
         button.backgroundColor = .blue
-        button.setTitle("Connect FrontDesk", for: .normal)
+        button.setTitle("Connect", for: .normal)
         button.addTarget(self, action: #selector(buttonConnectFD), for: .touchUpInside)
         self.view.addSubview(button)
         
@@ -36,11 +30,10 @@ class ViewController: UIViewController {
         button.addTarget(self, action: #selector(buttonLogin), for: .touchUpInside)
         self.view.addSubview(button)
         
-        // I'm a RMSRoomNode
         button = UIButton(frame: CGRect(x: 30, y: 200, width: 200, height: 50))
         button.backgroundColor = .red
-        button.setTitle("Connect RMSServer", for: .normal)
-        button.addTarget(self, action: #selector(buttonConnectRMS), for: .touchUpInside)
+        button.setTitle("GetOplCommands", for: .normal)
+        button.addTarget(self, action: #selector(buttonGetOplCommands), for: .touchUpInside)
         self.view.addSubview(button)
         
         button = UIButton(frame: CGRect(x: 240, y: 200, width: 100, height: 50))
@@ -49,7 +42,6 @@ class ViewController: UIViewController {
         button.addTarget(self, action: #selector(buttonEnrollRMS), for: .touchUpInside)
         self.view.addSubview(button)
         
-        // I'm a Lock
         button = UIButton(frame: CGRect(x: 20, y: 300, width: 210, height: 50))
         button.backgroundColor = .red
         button.setTitle("Connect RMSRoomNode", for: .normal)
@@ -62,15 +54,12 @@ class ViewController: UIViewController {
         button.addTarget(self, action: #selector(buttonEnrollRMSRmNd), for: .touchUpInside)
         self.view.addSubview(button)
         
-        
         print("Hello")
-
     }
     
     @objc func buttonConnectFD(sender: UIButton!) {
         print("connect FD")
-        client = MTSClient(useTLS: false, clientCert: nil, host: "172.20.10.5", port: 10001,
-                           mtsReceiver: mtsReceiver, proxy: nil, proxyUser: nil, proxyPassword: nil)
+        client = MTSClient(hostname: "172.20.10.5", port: 10001, mtsReceiver: mtsReceiver).Connect()
     }
     
     @objc func buttonLogin(sender: UIButton!)
@@ -95,9 +84,19 @@ class ViewController: UIViewController {
         client!.send(json.data(using: String.Encoding.utf8)!)
     }
     
-    @objc func buttonConnectRMS(sender: UIButton!)
+    @objc func buttonGetOplCommands(sender: UIButton!)
     {
-        print("connect RMS (with MTS)")
+        let jsonEncoder = JSONEncoder()
+        var json : String = ""
+        let mtsMessage = MTSMessage(route:"GetOplCommands", json:"")
+        do {
+            let jsonData = try jsonEncoder.encode(mtsMessage)
+            json = String(data: jsonData, encoding: String.Encoding.utf8)!
+        } catch {
+            print("json convert error")
+        }
+        print(json)
+        client!.send(json.data(using: String.Encoding.utf8)!)
     }
     
     @objc func buttonEnrollRMS(sender: UIButton!)
@@ -115,10 +114,34 @@ class ViewController: UIViewController {
     }
     
     func mtsReceiver(_ json: String) {
-        
         print("data \(json)")
+        let jsonDecoder = JSONDecoder()
+        var mtsMessage: MTSMessage?
+        do {
+            mtsMessage = try jsonDecoder.decode(MTSMessage.self, from: json.data(using: .utf8)!)
+        } catch {
+            print("json convert error")
+        }
+        print(mtsMessage!.Route)
+        switch mtsMessage!.Route {
+        case "RMSLoginResponse":
+            break
+        case "OplCommandsResponse":
+            do {
+                let oplCommands = try jsonDecoder.decode(OPLCommands.self, from: mtsMessage!.Json.data(using: .utf8)!)
+            
+                for (key, value) in oplCommands.OPLLists {
+                    print("\(key) -> \(value)")
+                }
+            
+            } catch {
+                print("json convert error")
+            }
+            break
+        default:
+            break
+        }
+        
     }
-
-
 }
 
