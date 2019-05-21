@@ -59,19 +59,25 @@ class ViewController: UIViewController {
     
     @objc func buttonConnect(sender: UIButton!) {
         displayConnected()
-        Log("Connecting ...")
+        if (useTls) {
+            Log("Connecting (with TLS) ...")
+        } else {
+            Log("Connecting (no TLS) ...")
+        }
         
-//        client = MTSClient(log: Log, url: tfURL!.text!, mtsRcvr: mtsReceiver)
-//        if (useTls) {
-//            client!.WithTLS(certificate: nil)
-//        }
-//        while (!client!.connected) {
-//            client!.Connect()
-//            if (client!.connected) {
-//                Log("still trying...")
-//                usleep(3000000)
-//            }
-//        }
+        client = MTSClient(log: Log, url: tfURL!.text!, mtsRcvr: mtsReceiver)
+        if (useTls) {
+            client!.WithTLS(certificate: nil)
+        }
+        while (!client!.connected) {
+            client!.Connect()
+            if (!client!.connected) {
+                usleep(3000000)
+                if (!client!.connected) {
+                    Log("still trying...")
+                }
+            }
+        }
         
         
         

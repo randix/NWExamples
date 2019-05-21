@@ -85,18 +85,18 @@ class MTSClient {
             break
         case .waiting(let error):
             // Handle connection waiting for network
-            print("waiting \(error)")
+            Log("waiting \(error)")
             break
         case .failed(let error):
             // Handle fatal connection error
-            print("failed \(error)")
+            Log("failed \(error)")
             break
         case .preparing:
             // Handle fatal connection error
-            print("preparing")
+            Log("preparing")
             break
         default:
-            print("default \(newState)")
+            Log("default \(newState)")
             break
         }
     }
