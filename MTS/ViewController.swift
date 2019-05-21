@@ -13,127 +13,93 @@ class ViewController: UIViewController {
     
     var client: MTSClient?
     
+    var screenWidth: Int?
+    var screenHeight: Int?
+    
+    let border = 5
+    let topOffset = 88
+    let bottomOffset = 20
+    
+    let inputHeight = 31    // standard height for UITextField and UIButton
+    let inputWidth = 250
+    let buttonWidth = 100
+    let chBoxWidth = 22
+    let interChk = 7
+    let tlsLabWidth = 35
+    let interButton = 20
+    
+    var tfURL: UITextField?
+    var tfUser: UITextField?
+    var tfPwd: UITextField?
+    var tfNodeId: UITextField?
+    var btConn: UIButton?
+    var tlsLab: UIButton?
+    var ckBox: UIButton?
+    var btPing: UIButton?
+    var btDisconn: UIButton?
+    var tView: UITextView?
+    
+    var useTls = false
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        self.view.backgroundColor = .white
+        // Do any additional setup after loaditjjsfnrhng the view.
+        self.view.backgroundColor = .lightGray
+        let screenRect = UIScreen.main.bounds
+        screenWidth = Int(screenRect.size.width)
+        screenHeight = Int(screenRect.size.height)
+        print(screenWidth!, screenHeight!)
         
-        var button = UIButton(frame: CGRect(x: 30, y: 100, width: 200, height: 50))
-        button.backgroundColor = .blue
-        button.setTitle("Connect", for: .normal)
-        button.addTarget(self, action: #selector(buttonConnectFD), for: .touchUpInside)
-        self.view.addSubview(button)
-        
-        button = UIButton(frame: CGRect(x: 240, y: 100, width: 100, height: 50))
-        button.backgroundColor = .green
-        button.setTitle("Login", for: .normal)
-        button.addTarget(self, action: #selector(buttonLogin), for: .touchUpInside)
-        self.view.addSubview(button)
-        
-        button = UIButton(frame: CGRect(x: 30, y: 200, width: 200, height: 50))
-        button.backgroundColor = .green
-        button.setTitle("GetOplCommands", for: .normal)
-        button.addTarget(self, action: #selector(buttonGetOplCommands), for: .touchUpInside)
-        self.view.addSubview(button)
-        
-        button = UIButton(frame: CGRect(x: 240, y: 200, width: 100, height: 50))
-        button.backgroundColor = .gray
-        button.setTitle("Enroll", for: .normal)
-        button.addTarget(self, action: #selector(buttonEnrollRMS), for: .touchUpInside)
-        self.view.addSubview(button)
-        
-        button = UIButton(frame: CGRect(x: 20, y: 300, width: 210, height: 50))
-        button.backgroundColor = .green
-        button.setTitle("GetOplCommands2", for: .normal)
-        button.addTarget(self, action: #selector(buttonGetOplCommands2), for: .touchUpInside)
-        self.view.addSubview(button)
-        
-        button = UIButton(frame: CGRect(x: 240, y: 300, width: 100, height: 50))
-        button.backgroundColor = .gray
-        button.setTitle("Enroll", for: .normal)
-        button.addTarget(self, action: #selector(buttonEnrollRMSRmNd), for: .touchUpInside)
-        self.view.addSubview(button)
-        
-        print("Hello")
+        createSubviews()
+        displayConnect()
     }
     
-    @objc func buttonConnectFD(sender: UIButton!) {
-        print("connect FD")
-        client = MTSClient(hostname: "172.20.10.5", port: 10001, mtsReceiver: mtsReceiver).Connect()
+   
+    
+    @objc func buttonConnect(sender: UIButton!) {
+        displayConnected()
+        Log("Connecting ...")
+        
+//        client = MTSClient(log: Log, url: tfURL!.text!, mtsRcvr: mtsReceiver)
+//        if (useTls) {
+//            client!.WithTLS(certificate: nil)
+//        }
+//        while (!client!.connected) {
+//            client!.Connect()
+//            if (client!.connected) {
+//                Log("still trying...")
+//                usleep(3000000)
+//            }
+//        }
+        
+        
+        
+//        let login = Login(user:tfUser!.text!, password:tfPwd!.text!, appId:AppId.RMSRmNd, appKey:Data())
+//        let jsonEncoder = JSONEncoder()
+//        var jsonData : Data
+//        do {
+//            jsonData = try jsonEncoder.encode(login)
+//        } catch {
+//            print("json convert error")
+//        }
+//
+//        client!.send(mtsMessage)
     }
     
-    @objc func buttonLogin(sender: UIButton!)
-    {
-        let login = Login(user:"user", password:"password")
-        let jsonEncoder = JSONEncoder()
-        var json : String = ""
-        do {
-            let jsonData = try jsonEncoder.encode(login)
-            json = String(data: jsonData, encoding: String.Encoding.utf8)!
-        } catch {
-            print("json convert error")
-        }
-        let mtsMessage = MTSMessage(route:.Login, messageType:.Request, json:json)
-        do {
-            let jsonData = try jsonEncoder.encode(mtsMessage)
-            json = String(data: jsonData, encoding: String.Encoding.utf8)!
-        } catch {
-            print("json convert error")
-        }
-        print(json)
-        client!.send(json.data(using: String.Encoding.utf8)!)
+    @objc func buttonPing(sender: UIButton!) {
+        Log("Ping...")
+       
     }
-    
-    @objc func buttonGetOplCommands(sender: UIButton!)
-    {
-        let jsonEncoder = JSONEncoder()
-        var json : String = ""
-        let mtsMessage = MTSMessage(route:.OplCommands, messageType:.Request, json:"")
-        do {
-            let jsonData = try jsonEncoder.encode(mtsMessage)
-            json = String(data: jsonData, encoding: String.Encoding.utf8)!
-        } catch {
-            print("json convert error")
-        }
-        print(json)
-        client!.send(json.data(using: String.Encoding.utf8)!)
-    }
-    
-    @objc func buttonGetOplCommands2(sender: UIButton!)
-    {
-        let jsonEncoder = JSONEncoder()
-        var json : String = ""
-        let mtsMessage = MTSMessage(route:.OplCommands, messageType:.Request, json:"")
-        do {
-            let jsonData = try jsonEncoder.encode(mtsMessage)
-            json = String(data: jsonData, encoding: String.Encoding.utf8)!
-        } catch {
-            print("json convert error")
-        }
-        print(json)
-        let oplCommands = client!.sendAwait(json.data(using: String.Encoding.utf8)!) as! OPLCommands
-        for (key, value) in oplCommands.OPLLists {
-            print("\(key) -> \(value)")
-        }
-        print("got synchronously")
-    }
-    
-    @objc func buttonEnrollRMS(sender: UIButton!)
-    {
-        print("enroll RMS (with MTS)")
-    }
-    
-    @objc func buttonConnectRMSRmNd(sender: UIButton!)
-    {
-        print("connect RMSRmNd (with OPL)")
-    }
-    @objc func buttonEnrollRMSRmNd(sender: UIButton!)
-    {
-        print("enroll RMSRmNd (with OPL)")
+  
+    @objc func buttonDisconnect(sender: UIButton!) {
+        displayConnect()
+        
+        Log("Disconnected")
     }
     
     func mtsReceiver(_ mtsMessage: MTSMessage) {
-        print("mtsMessage \(mtsMessage)")
+        Log("mtsMessage \(mtsMessage)")
         let jsonDecoder = JSONDecoder()
 
         print(mtsMessage.Route)
@@ -142,17 +108,153 @@ class ViewController: UIViewController {
             break
         case .OplCommands:
             do {
-                let oplCommands = try jsonDecoder.decode(OPLCommands.self, from: mtsMessage.Json.data(using: .utf8)!)
+                //let oplCommands = try jsonDecoder.decode(OPLCommands.self, from: mtsMessage.Json.data(using: .utf8)!)
             
-                for (key, value) in oplCommands.OPLLists {
-                    print("\(key) -> \(value)")
-                }
+//                for (key, value) in oplCommands.OPLLists {
+//                    print("\(key) -> \(value)")
+//                }
             } catch {
-                print("OPLCommands json convert error")
+                Log("OPLCommands json convert error")
             }
             break
         default:
             break
+        }
+    }
+    
+    func Log(_ text: String) -> Void {
+        let currentDateTime = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeStyle = .medium
+        tView!.text += "\(dateFormatter.string(from: currentDateTime)) \(text)\n"
+        print(text)
+        let range = NSMakeRange(tView!.text.count - 1, 0)
+        tView!.scrollRangeToVisible(range)
+    }
+    
+    func createSubviews() {
+        
+        let inputOffset = (screenWidth! - inputWidth) / 2
+        let buttonOffset = (screenWidth! - buttonWidth - interButton - buttonWidth) / 2
+        let buttonOffset2 = (screenWidth! - chBoxWidth - interButton - tlsLabWidth - interButton - buttonWidth) / 2
+        
+        // connect to RMS Server
+        tfURL = UITextField(frame: CGRect(x:inputOffset, y:topOffset+border, width:inputWidth, height:inputHeight))
+        tfURL!.borderStyle = .roundedRect
+        tfURL!.placeholder = "127.0.0.1:10002"
+        tfURL!.text = "172.25.3.142:10002"
+        tfURL!.text = "172.20.10.5:10002"
+        tfURL!.backgroundColor = UIColor.white
+        tfURL!.textColor = UIColor.blue
+        
+        tfUser = UITextField(frame: CGRect(x:inputOffset, y:topOffset+2*border+inputHeight, width:inputWidth, height:inputHeight))
+        tfUser!.borderStyle = .roundedRect
+        tfUser!.text = "OnityTech"
+        tfUser!.placeholder = "user"
+        tfUser!.backgroundColor = UIColor.white
+        tfUser!.textColor = UIColor.blue
+        
+        tfPwd = UITextField(frame: CGRect(x:inputOffset, y:topOffset+3*border+2*inputHeight, width:inputWidth, height:inputHeight))
+        tfPwd!.borderStyle = .roundedRect
+        tfPwd!.text = "password"
+        tfPwd!.placeholder = "password"
+        tfPwd!.backgroundColor = UIColor.white
+        tfPwd!.textColor = UIColor.blue
+        tfPwd!.isSecureTextEntry = true
+        
+        tfNodeId = UITextField(frame: CGRect(x:inputOffset, y:topOffset+4*border+3*inputHeight, width:inputWidth, height:inputHeight))
+        tfNodeId!.borderStyle = .roundedRect
+        tfNodeId!.text = "10104"
+        tfNodeId!.placeholder = "node id"
+        tfNodeId!.backgroundColor = UIColor.white
+        tfNodeId!.textColor = UIColor.blue
+        
+        
+        ckBox = UIButton(frame: CGRect(x:buttonOffset2, y:topOffset+4*border+4*inputHeight, width: chBoxWidth, height:inputHeight))
+        ckBox!.backgroundColor = .lightGray
+        ckBox!.setTitleColor(.blue, for: .normal)
+        displayChBox()
+        ckBox!.addTarget(self, action: #selector(buttonCheck), for: .touchUpInside)
+        
+        tlsLab = UIButton(frame: CGRect(x:buttonOffset2+chBoxWidth+interChk, y:topOffset+4*border+4*inputHeight, width: tlsLabWidth, height:inputHeight))
+        tlsLab!.backgroundColor = .lightGray
+        tlsLab!.setTitleColor(.blue, for: .normal)
+        tlsLab!.setTitle("TLS", for: .normal)
+        tlsLab!.addTarget(self, action: #selector(buttonCheck), for: .touchUpInside)
+      
+        
+        btConn = UIButton(frame: CGRect(x:buttonOffset2+chBoxWidth+interChk+tlsLabWidth+interButton, y:topOffset+4*border+4*inputHeight, width:buttonWidth, height:inputHeight))
+        btConn!.backgroundColor = .lightGray
+        btConn!.setTitleColor(.blue, for: .normal)
+        btConn!.setTitle("Connect", for: .normal)
+        btConn!.addTarget(self, action: #selector(buttonConnect), for: .touchUpInside)
+        
+        
+        btPing = UIButton(frame: CGRect(x:buttonOffset, y:topOffset, width:buttonWidth, height:inputHeight))
+        btPing!.backgroundColor = .lightGray
+        btPing!.setTitleColor(.blue, for: .normal)
+        btPing!.setTitle("Ping", for: .normal)
+        btPing!.addTarget(self, action: #selector(buttonPing), for: .touchUpInside)
+        
+        btDisconn = UIButton(frame: CGRect(x:buttonOffset+buttonWidth+interButton, y:topOffset, width:buttonWidth, height:inputHeight))
+        btDisconn!.backgroundColor = .lightGray
+        btDisconn!.setTitleColor(.blue, for: .normal)
+        btDisconn!.setTitle("Disconnect", for: .normal)
+        btDisconn!.addTarget(self, action: #selector(buttonDisconnect), for: .touchUpInside)
+        
+        let myFrame = CGRect(x:0, y:0, width:1, height:1)
+        tView = UITextView(frame: myFrame)
+        tView!.backgroundColor = .lightGray
+        tView!.text = "RMSRmNd Version 0.5\n"
+    }
+    
+    func displayConnect() {
+        let subViews = self.view.subviews
+        for subview in subViews{
+            subview.removeFromSuperview()
+        }
+        self.view.addSubview(tfURL!)
+        self.view.addSubview(tfUser!)
+        self.view.addSubview(tfPwd!)
+        self.view.addSubview(tfNodeId!)
+        self.view.addSubview(ckBox!)
+        self.view.addSubview(tlsLab!)
+        self.view.addSubview(btConn!)
+        
+        let myY = topOffset+4*border+5*inputHeight
+        let myW = screenWidth!-2*border
+        let myH = screenHeight!-myY-bottomOffset
+        let myFrame = CGRect(x:border, y: myY, width: myW, height: myH)
+        tView!.frame = myFrame
+        self.view.addSubview(tView!)
+    }
+    
+    func displayConnected() {
+        let subViews = self.view.subviews
+        for subview in subViews{
+            subview.removeFromSuperview()
+        }
+        self.view.addSubview(btPing!)
+        self.view.addSubview(btDisconn!)
+        
+        let myY = topOffset+inputHeight
+        let myW = screenWidth!-2*border
+        let myH = screenHeight!-myY-bottomOffset
+        let myFrame = CGRect(x:border, y: myY, width: myW, height: myH)
+        tView!.frame = myFrame
+        self.view.addSubview(tView!)
+    }
+    
+    @objc func buttonCheck(sender: UIButton) {
+        useTls = !useTls
+        displayChBox()
+    }
+    
+    func displayChBox() {
+        if (useTls) {
+            ckBox!.setTitle("☑︎", for: .normal)
+        } else {
+            ckBox!.setTitle("☐", for: .normal)
         }
     }
 }

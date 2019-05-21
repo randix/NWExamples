@@ -5,105 +5,29 @@
 //  Created by Rand Dow on 5/1/19.
 //  Copyright © 2019 Rand Dow. All rights reserved.
 //
+// THIS IS A CLIENT ONLY IMPLEMENTATION
 
 import Foundation
 import Network
 
-enum MTSType: Int{
-    case Request = 1
-    case Reply   = 2
-}
-struct MTSMessage : Codable {
-    var Route: Int
-    var MessageType: Int
-    var Json: String
-    
-    init(route: MTSRequest, messageType: MTSType, json: String) {
-        Route = route.rawValue
-        MessageType = messageType.rawValue
-        Json = json
-    }
-}
-
-
-class MTSServer {
-    var ListenerPort: NWEndpoint.Port
-    var Listener: NWListener?
-    var ServerCertificate: Data?
-    var ClientCertificateRequired: Bool = false
-    var MtsReceiver: (_ receive: String) -> Void
-    var clients: [MTSClient] = []
-    
-    init(port: UInt16, mtsReceiver: @escaping (_ receive: String) -> Void) {
-        ListenerPort = NWEndpoint.Port(integerLiteral: port)
-        MtsReceiver = mtsReceiver
-    }
-    
-    func WithTLS(certificate: Data, clientCertificateRequired: Bool = false) -> MTSServer {
-        ServerCertificate = certificate
-        ClientCertificateRequired = clientCertificateRequired
-        return self
-    }
-    
-    func ClientCerficateRequired(clientCertificateRequired: Bool) -> Void {
-        ClientCertificateRequired = clientCertificateRequired
-    }
-    
-    func Start() throws -> MTSServer {
-        //var parameters = NWParameters()
-        Listener = try NWListener(using: .tcp, on: ListenerPort)
-        Listener!.stateUpdateHandler = self.stateDidChange(to:)
-        Listener!.newConnectionHandler = self.didAccept(connection:)
-        Listener!.start(queue: .main)
-        return self
-    }
-    
-    func Stop() -> Void {
-        // TODO
-    }
-    
-    func stateDidChange(to newState: NWListener.State) {
-        switch newState {
-        case .setup:
-            break
-        case .waiting:
-            break
-        case .ready:
-            break
-        case .cancelled:
-            break
-        case .failed(_):
-            break
-        @unknown default:
-            break
-        }
-    }
-    
-    //    func listenerDidFail(error: error) {
-    //
-    //    }
-    //
-    func didAccept(connection: NWConnection) {
-        
-    }
-}
-
 
 class MTSClient {
-    var Url: URL
-    var Hostname: String?
-    var Port: UInt16?
-    var MtsReceiver: (_ receive: MTSMessage) -> Void
+    
+    var connected = false
+    var hostname: String
+    var port: UInt16
+    var mtsReceiver: (_ receive: MTSMessage) -> Void
     
     var useTLS = false
-    var ClientCertificate: Data?
+    var clientCertificate: Data?
     
-    var ProxyURL: URL?
-    var ProxyUser: String?
-    var ProxyPassword: String?
+    var proxyHostname: String?
+    var proxyPort: UInt16?
+    var proxyUser: String?
+    var proxyPassword: String?
+    var proxyTransactComplete = false
     
     var connection: NWConnection?
-    var connected = false
     
     let await = DispatchSemaphore(value: 0)
     var waiting = false
@@ -111,36 +35,40 @@ class MTSClient {
     var buffer = Data()
     var expected = 0
     
-    init(url: URL, mtsReceiver: @escaping (_ receive: MTSMessage) -> Void) {
-        Url = url
-        MtsReceiver = mtsReceiver
-    }
+    var Log: (_ log: String) -> Void
     
-    init(hostname: String, port: UInt16, mtsReceiver: @escaping (_ receive: MTSMessage) -> Void) {
-        Hostname = hostname
-        Port = port
-        Url = URL(string: "\(Hostname!):\(Port!)")!
-        MtsReceiver = mtsReceiver
+    init(log: @escaping (_ log: String) -> Void, url: String, mtsRcvr: @escaping (_ receive: MTSMessage) -> Void) {
+        Log = log
+        let s = url.components(separatedBy: ":")
+        hostname = s[0]
+        port = UInt16(s[1])!
+        print(hostname, port)
+        mtsReceiver = mtsRcvr
     }
     
     func WithTLS(certificate: Data?) -> MTSClient {
         useTLS = true
-        ClientCertificate = certificate
+        clientCertificate = certificate
         return self
     }
     
-    func WithProxy(proxyURL: URL, proxyUser: String?, proxyPassword: String?) -> MTSClient {
-        ProxyURL = proxyURL
-        ProxyUser = proxyUser
-        ProxyPassword = proxyPassword
+    func WithProxy(ProxyURL: String, ProxyUser: String?, ProxyPassword: String?) -> MTSClient {
+        let s = ProxyURL.components(separatedBy: ":")
+        proxyHostname = s[0]
+        proxyPort = UInt16(s[1])!
+        proxyUser = ProxyUser
+        proxyPassword = ProxyPassword
         return self
     }
     
     func Connect() -> MTSClient {
+        Log("connect to \(hostname):\(port)")
         if useTLS {
-            connection = NWConnection(host: "172.20.10.5", port: 10001, using: .tls)
+            Log("using TLS")
+            connection = NWConnection(host: NWEndpoint.Host(hostname), port: NWEndpoint.Port(rawValue: UInt16(port))!, using: .tls)
         } else {
-            connection = NWConnection(host: "172.20.10.5", port: 10001, using: .tcp)
+            Log("not using TLS")
+            connection = NWConnection(host: NWEndpoint.Host(hostname), port: NWEndpoint.Port(rawValue: UInt16(port))!, using: .tcp)
         }
         connection!.stateUpdateHandler = self.stateDidChange(to:)
         setupReceive(on: connection!)
@@ -152,7 +80,7 @@ class MTSClient {
         switch(newState) {
         case .ready:
             // Handle connection established
-            print("connected")
+            Log("connected")
             self.connected = true
             break
         case .waiting(let error):
@@ -177,16 +105,16 @@ class MTSClient {
         connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { (data, contentContext, isComplete, error) in
             if var data = data, !data.isEmpty {
                 // … process the data …
-                print("did receive \(data.count) \(self.expected) bytes")
+                self.Log("did receive \(data.count) \(self.expected) bytes")
                 if (self.buffer.count == 0 && self.expected == 0) {
                     self.expected  = Int(data.removeFirst())
                     self.expected |= Int(data.removeFirst()) << 8
                     self.expected |= Int(data.removeFirst()) << 16
                     self.expected |= Int(data.removeFirst()) << 24
-                    print("expected: \(self.expected) bytes")
+                    self.Log("expected: \(self.expected) bytes")
                 }
                 self.buffer.append(data)
-                print("have \(self.buffer.count) expected \(self.expected)")
+                self.Log("have \(self.buffer.count) expected \(self.expected)")
                 if (self.buffer.count == self.expected) {
                     let jsonDecoder = JSONDecoder()
                     var mtsMessage: MTSMessage?
@@ -195,10 +123,10 @@ class MTSClient {
                     } catch {
                         print("receive json convert error")
                     }
-                    if (self.waiting && MTSType(rawValue: mtsMessage!.MessageType) == .Reply) {
+                    if (self.waiting && mtsMessage!.Reply) {
                         self.waitReceiver(mtsMessage!)
                     } else {
-                        self.MtsReceiver(mtsMessage!)
+                        self.mtsReceiver(mtsMessage!)
                     }
                     self.buffer = Data()
                     self.expected = 0
@@ -250,20 +178,20 @@ class MTSClient {
         return obj!
     }
     func waitReceiver(_ mtsMessage: MTSMessage) {
-        print("mtsMessage \(mtsMessage)")
+        Log("mtsMessage \(mtsMessage)")
         let jsonDecoder = JSONDecoder()
         print(mtsMessage.Route)
         switch MTSRequest(rawValue: mtsMessage.Route)! {
         case .Login:
             do {
-                obj = try jsonDecoder.decode(RMSLoginResponse.self, from: mtsMessage.Json.data(using: .utf8)!) as AnyObject
+                //obj = try jsonDecoder.decode(RMSLoginResponse.self, from: mtsMessage.Json.data(using: .utf8)!) as AnyObject
             } catch {
                 print("RMSLoginResponse json convert error")
             }
             break
         case .OplCommands:
             do {
-                obj = try jsonDecoder.decode(OPLCommands.self, from: mtsMessage.Json.data(using: .utf8)!) as AnyObject
+                //obj = try jsonDecoder.decode(OPLCommands.self, from: mtsMessage.Json.data(using: .utf8)!) as AnyObject
             } catch {
                 print("OPLCommands json convert error")
             }

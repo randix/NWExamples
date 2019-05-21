@@ -8,16 +8,31 @@
 
 import Foundation
 
+enum AppId: Int {
+    case RMSServer = 1
+    case RMSRmNd
+    case BTPP
+}
+
 struct Login : Codable {
     var User: String
     var Password: String
+    var AppId: Int
+    var AppKey: Data
     
-    init(user: String, password: String) {
+    init(user: String, password: String, appId: AppId, appKey: Data) {
         User = user
         Password = password
+        AppId = appId.rawValue
+        AppKey = appKey
     }
 }
 
 struct RMSLoginResponse : Codable {
+    var NodeAuth: String
     var ClientCertificate: Data?
+    var ServerCertInfo: String
+    var MtuBluetooh: Int
+    var MtuOpl: Int
+    var MtuMts: Int
 }
