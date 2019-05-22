@@ -8,6 +8,6 @@
 
 import Foundation
 
-struct Enroll {
+struct MtsEnroll : Codable {
     var NodeId: Int
 }

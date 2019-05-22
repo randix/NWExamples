@@ -14,14 +14,14 @@ enum AppId: Int {
     case BTPP
 }
 
-struct Login : Codable {
-    var User: String
+struct MtsLogin : Codable {
+    var Username: String
     var Password: String
     var AppId: Int
     var AppKey: Data
     
     init(user: String, password: String, appId: AppId, appKey: Data) {
-        User = user
+        Username = user
         Password = password
         AppId = appId.rawValue
         AppKey = appKey

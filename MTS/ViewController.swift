@@ -31,7 +31,7 @@ class ViewController: UIViewController {
     var tfURL: UITextField?
     var tfUser: UITextField?
     var tfPwd: UITextField?
-    var tfNodeId: UITextField?
+    var tfRoomId: UITextField?
     var btConn: UIButton?
     var tlsLab: UIButton?
     var ckBox: UIButton?
@@ -41,7 +41,6 @@ class ViewController: UIViewController {
     
     var useTls = false
 
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loaditjjsfnrhng the view.
@@ -55,42 +54,55 @@ class ViewController: UIViewController {
         displayConnect()
     }
     
-   
-    
     @objc func buttonConnect(sender: UIButton!) {
-        displayConnected()
+       
         if (useTls) {
             Log("Connecting (with TLS) ...")
         } else {
             Log("Connecting (no TLS) ...")
         }
         
-        client = MTSClient(log: Log, url: tfURL!.text!, mtsRcvr: mtsReceiver)
+        client = MTSClient(log: Log, url: tfURL!.text!, mtsRcvr: mtsReceiver, connCB: connectCallback)
         if (useTls) {
             client!.WithTLS(certificate: nil)
         }
-        while (!client!.connected) {
-            client!.Connect()
-            if (!client!.connected) {
-                usleep(3000000)
-                if (!client!.connected) {
-                    Log("still trying...")
-                }
+        client!.Connect()
+    }
+    
+    func connectCallback()
+    {
+        let jsonEncoder = JSONEncoder()
+        var jsonData: Data
+        if (useTls) {
+            // connected to FrontDeskServer -- get PP type stuff
+            // let login = Login(user:tfUser!.text!, password:tfPwd!.text!, appId:AppId.RMSRmNd, appKey:Data())
+            //        var jsonData : Data
+            //        do {
+            //            jsonData = try jsonEncoder.encode(login)
+            //        } catch {
+            //            print("json convert error")
+            //        }
+            //
+            //        client!.send(mtsMessage)
+            
+        } else {
+            // connected to RMSServer -- get Room NodeIds
+            Log("get Room data")
+            let rmReq = tfRoomId!.text
+            do {
+                jsonData = try jsonEncoder.encode(rmReq)
+            } catch {
+                Log("json convert error")
             }
+//            let mtsRequest = MTSMessage(route: MTSRequest.RoomsMap, jwt: "", data: jsonData)
+//            do {
+//                jsonData = try jsonEncoder.encode(MTSRequest)
+//            } catch {
+//                Log("json convert error")
+//            }
+//            client!.sendAwait(jsonData)
         }
-        
-        
-        
-//        let login = Login(user:tfUser!.text!, password:tfPwd!.text!, appId:AppId.RMSRmNd, appKey:Data())
-//        let jsonEncoder = JSONEncoder()
-//        var jsonData : Data
-//        do {
-//            jsonData = try jsonEncoder.encode(login)
-//        } catch {
-//            print("json convert error")
-//        }
-//
-//        client!.send(mtsMessage)
+         displayConnected()
     }
     
     @objc func buttonPing(sender: UIButton!) {
@@ -100,8 +112,8 @@ class ViewController: UIViewController {
   
     @objc func buttonDisconnect(sender: UIButton!) {
         displayConnect()
-        
-        Log("Disconnected")
+        client?.Stop(status: "shutting down")
+        Log("disconnected")
     }
     
     func mtsReceiver(_ mtsMessage: MTSMessage) {
@@ -136,6 +148,7 @@ class ViewController: UIViewController {
         print(text)
         let range = NSMakeRange(tView!.text.count - 1, 0)
         tView!.scrollRangeToVisible(range)
+        self.reloadInputViews()
     }
     
     func createSubviews() {
@@ -148,8 +161,8 @@ class ViewController: UIViewController {
         tfURL = UITextField(frame: CGRect(x:inputOffset, y:topOffset+border, width:inputWidth, height:inputHeight))
         tfURL!.borderStyle = .roundedRect
         tfURL!.placeholder = "127.0.0.1:10002"
-        tfURL!.text = "172.25.3.142:10002"
-        tfURL!.text = "172.20.10.5:10002"
+        tfURL!.text = "172.20.10.5:10001"
+        //tfURL!.text = "172.20.10.5:10002"
         tfURL!.backgroundColor = UIColor.white
         tfURL!.textColor = UIColor.blue
         
@@ -168,12 +181,12 @@ class ViewController: UIViewController {
         tfPwd!.textColor = UIColor.blue
         tfPwd!.isSecureTextEntry = true
         
-        tfNodeId = UITextField(frame: CGRect(x:inputOffset, y:topOffset+4*border+3*inputHeight, width:inputWidth, height:inputHeight))
-        tfNodeId!.borderStyle = .roundedRect
-        tfNodeId!.text = "10104"
-        tfNodeId!.placeholder = "node id"
-        tfNodeId!.backgroundColor = UIColor.white
-        tfNodeId!.textColor = UIColor.blue
+        tfRoomId = UITextField(frame: CGRect(x:inputOffset, y:topOffset+4*border+3*inputHeight, width:inputWidth, height:inputHeight))
+        tfRoomId!.borderStyle = .roundedRect
+        tfRoomId!.text = "101"
+        tfRoomId!.placeholder = "room id"
+        tfRoomId!.backgroundColor = UIColor.white
+        tfRoomId!.textColor = UIColor.blue
         
         
         ckBox = UIButton(frame: CGRect(x:buttonOffset2, y:topOffset+4*border+4*inputHeight, width: chBoxWidth, height:inputHeight))
@@ -222,7 +235,7 @@ class ViewController: UIViewController {
         self.view.addSubview(tfURL!)
         self.view.addSubview(tfUser!)
         self.view.addSubview(tfPwd!)
-        self.view.addSubview(tfNodeId!)
+        self.view.addSubview(tfRoomId!)
         self.view.addSubview(ckBox!)
         self.view.addSubview(tlsLab!)
         self.view.addSubview(btConn!)

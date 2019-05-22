@@ -17,6 +17,7 @@ class MTSClient {
     var hostname: String
     var port: UInt16
     var mtsReceiver: (_ receive: MTSMessage) -> Void
+    var connectCallback: () -> Void
     
     var useTLS = false
     var clientCertificate: Data?
@@ -37,13 +38,13 @@ class MTSClient {
     
     var Log: (_ log: String) -> Void
     
-    init(log: @escaping (_ log: String) -> Void, url: String, mtsRcvr: @escaping (_ receive: MTSMessage) -> Void) {
+    init(log: @escaping (_ log: String) -> Void, url: String, mtsRcvr: @escaping (_ receive: MTSMessage) -> Void, connCB: @escaping () -> Void) {
         Log = log
         let s = url.components(separatedBy: ":")
         hostname = s[0]
         port = UInt16(s[1])!
-        print(hostname, port)
         mtsReceiver = mtsRcvr
+        connectCallback = connCB
     }
     
     func WithTLS(certificate: Data?) -> MTSClient {
@@ -62,26 +63,30 @@ class MTSClient {
     }
     
     func Connect() -> MTSClient {
-        Log("connect to \(hostname):\(port)")
+        Log("connect to \(hostname):\(port) (TLS=\(useTLS))")
+        // TODO client cert not implemented
+        // TODO proxy not implemented
+        let myHost = NWEndpoint.Host(hostname)
+        let myPort =  NWEndpoint.Port(rawValue: UInt16(port))!
         if useTLS {
-            Log("using TLS")
-            connection = NWConnection(host: NWEndpoint.Host(hostname), port: NWEndpoint.Port(rawValue: UInt16(port))!, using: .tls)
+            connection = NWConnection(host: myHost, port: myPort,// using: .tls)
+                    using: createTLSParameters(allowInsecure: true, queue: .main))
         } else {
-            Log("not using TLS")
-            connection = NWConnection(host: NWEndpoint.Host(hostname), port: NWEndpoint.Port(rawValue: UInt16(port))!, using: .tcp)
+            connection = NWConnection(host: myHost, port: myPort, using: .tcp)
         }
-        connection!.stateUpdateHandler = self.stateDidChange(to:)
+        connection!.stateUpdateHandler = stateDidChange(to:)
         setupReceive(on: connection!)
         connection!.start(queue: .main)
         return self
     }
     
     func stateDidChange(to newState: NWConnection.State) {
-        switch(newState) {
+        switch (newState) {
         case .ready:
             // Handle connection established
             Log("connected")
             self.connected = true
+            connectCallback()
             break
         case .waiting(let error):
             // Handle connection waiting for network
@@ -99,6 +104,24 @@ class MTSClient {
             Log("default \(newState)")
             break
         }
+    }
+    
+    func createTLSParameters(allowInsecure: Bool, queue: DispatchQueue) -> NWParameters {
+        let options = NWProtocolTLS.Options()
+        sec_protocol_options_set_verify_block(options.securityProtocolOptions, { (sec_protocol_metadata, sec_trust, sec_protocol_verify_complete) in
+            let trust = sec_trust_copy_ref(sec_trust).takeRetainedValue()
+            var error: CFError?
+            if SecTrustEvaluateWithError(trust, &error) {
+                sec_protocol_verify_complete(true)
+            } else {
+                if allowInsecure == true {
+                    sec_protocol_verify_complete(true)
+                } else {
+                    sec_protocol_verify_complete(false)
+                }
+            }
+        }, queue)
+        return NWParameters(tls: options)
     }
     
     func setupReceive(on connection: NWConnection) {
@@ -134,7 +157,7 @@ class MTSClient {
             }
             if isComplete {
                 // … handle end of stream …
-                self.stop(status: "EOF")
+                self.Stop(status: "EOF")
             } else if let error = error {
                 // … handle error …
                 self.connectionFailed(error: error)
@@ -145,7 +168,7 @@ class MTSClient {
         }
     }
     
-    func stop(status: String) {
+    func Stop(status: String) {
         print("status \(status)")
     }
     
