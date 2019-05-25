@@ -75,7 +75,7 @@ class ViewController: UIViewController {
         
         client = MTSClient(log: Log, url: tfURL!.text!, mtsRcvr: mtsReceiver, connCB: connectCallback)
         if (useTls) {
-            client!.WithTLS(certificate: nil)
+            client!.WithTLS(nil)
         }
         client!.Connect()
     }
@@ -99,7 +99,7 @@ class ViewController: UIViewController {
         displayConnected()
     }
     
-    // This is the main driver of the RoomNode app, like a state machine
+    // This is the main driver of the RoomNode app
     // The PP will have a UI
     func mtsReceiver(_ mtsMessage: MTSMessage) {
         Log("mtsMessage \(mtsMessage)")
@@ -127,24 +127,19 @@ class ViewController: UIViewController {
             let lr = try! decoder.decode(MtsLoginResponse.self, from: mtsMessage.Data)
             loginResponse = lr
             if !loginWithCertDone && loginResponse!.ClientCertificate != nil {
-                // relogin with the cert
                 // TODO -- PP
-                // 1: stop current client, reconnect cert; on connect(!! not here): login again -- STATE MACHINE!!
-//                let login = MtsLogin(user:tfUser!.text!, password:tfPwd!.text!, appId:AppId.RMSRmNd, appKey:Data())
-//                let data = try! MTSHandler.MTSConvert(login)
-//                mtsMessage = MTSMessage(route: MTSRequest.Login, jwt: "jwt", data: data)
-//
-//                client?.Stop(status: "to relogin)
-//                client = MTSClient(log: Log, url: tfURL!.text!, mtsRcvr: mtsReceiver, connCB: connectCallback)
-//                if (useTls) {
-//                    client!.WithTLS(certificate: nil)
-//                }
-//                client!.Connect()
+                client!.Stop("relogin")
+                // 2: new client
+                client = MTSClient(log: Log, url: tfURL!.text!, mtsRcvr: mtsReceiver, connCB: connectCallback)
+                    .WithTLS(loginResponse!.ClientCertificate)
+                client!.Connect()
+                return
             }
             if roomMap == nil {
                 // get room map
                 let mtsMessage = MTSMessage(route: MTSRequest.RoomsMap, jwt: "jwt", data: Data())
                 client!.send(mtsMessage)
+                return
             }
             break
             
@@ -159,6 +154,11 @@ class ViewController: UIViewController {
             if (useTls) {
                 // TODO -- PP
                 roomMap = roomToNodeIdsResponse
+                
+                // TODO -- now get the keys
+                
+                
+                
             } else {
                 roomToNodeIds = roomToNodeIdsResponse[0]
                 for nodeId in roomToNodeIds!.NodeIds {
@@ -185,7 +185,7 @@ class ViewController: UIViewController {
   
     @objc func buttonDisconnect(sender: UIButton!) {
         displayConnect()
-        client?.Stop(status: "shutting down")
+        client?.Stop("shutting down")
         Log("disconnected")
     }
     

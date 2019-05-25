@@ -48,14 +48,14 @@ class MTSClient {
     }
     
     @discardableResult
-    func WithTLS(certificate: Data?) -> MTSClient {
+    func WithTLS(_ certificate: Data?) -> MTSClient {
         useTLS = true
         clientCertificate = certificate
         return self
     }
     
     @discardableResult
-    func WithProxy(ProxyURL: String, ProxyUser: String?, ProxyPassword: String?) -> MTSClient {
+    func WithProxy(_ ProxyURL: String, ProxyUser: String?, ProxyPassword: String?) -> MTSClient {
         let s = ProxyURL.components(separatedBy: ":")
         proxyHostname = s[0]
         proxyPort = UInt16(s[1])!
@@ -161,7 +161,7 @@ class MTSClient {
             }
             if isComplete {
                 // … handle end of stream …
-                self.Stop(status: "EOF")
+                self.Stop("EOF")
             } else if let error = error {
                 // … handle error …
                 print("error")
@@ -173,7 +173,7 @@ class MTSClient {
         }
     }
     
-    func Stop(status: String) {
+    func Stop(_ status: String) {
         print("status \(status)")
     }
     
