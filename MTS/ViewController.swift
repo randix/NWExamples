@@ -89,6 +89,8 @@ class ViewController: UIViewController {
          displayConnected()
     }
     
+    // This is the main driver of the RoomNode app, like a state machine
+    // The PP will have a UI
     func mtsReceiver(_ mtsMessage: MTSMessage) {
         Log("mtsMessage \(mtsMessage)")
         let decoder = JSONDecoder()
