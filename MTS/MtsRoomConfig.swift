@@ -19,31 +19,22 @@ enum NodeIdSubNetOffset : Int {
     case Lock5     = 7
 }
 
-struct RoomId : Codable {
-    var RoomId: String
+struct Room : Codable {
+    var RoomName: String
+    init(_ room: String) {
+        RoomName = room
+    }
 }
 
 struct RoomToNodeIds : Codable {
     var RoomName: String
     var NodeIds: [Int]
-}
-
-struct RoomToNodeIdsMap : Codable {
-    var RoomToNodeIds: [RoomToNodeIds]
-}
-
-struct NodeIdToRoom : Codable {
-    var NodeId: Int
-    var RoomName: String
-}
-
-struct NodeIdsToRoomsMap : Codable {
-    var NodeIdToRoom: [NodeIdToRoom]
+    
 }
 
 enum OPLListType:Int {
     case Ping                = 1
-    case RoutintTableRequest = 2
+    case RoutingTableRequest = 2
     case Enroll              = 3
     case ClearEnroll         = 4
 }

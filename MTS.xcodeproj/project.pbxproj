@@ -7,11 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A403407422934B3E006CB2F3 /* MtsEnroll.swift in Sources */ = {isa = PBXBuildFile; fileRef = A403407322934B3E006CB2F3 /* MtsEnroll.swift */; };
 		A403407622934D3C006CB2F3 /* MTSHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A403407522934D3C006CB2F3 /* MTSHandler.swift */; };
 		A4313E7A2283DB97001644BE /* MtsLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4313E792283DB97001644BE /* MtsLogin.swift */; };
 		A4313E7C2283DB9F001644BE /* MessageTransferSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4313E7B2283DB9F001644BE /* MessageTransferSystem.swift */; };
-		A4313E802283E552001644BE /* RoomConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4313E7F2283E552001644BE /* RoomConfig.swift */; };
+		A4313E802283E552001644BE /* MtsRoomConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4313E7F2283E552001644BE /* MtsRoomConfig.swift */; };
 		A4E4FB1E2277FE5400A00744 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E4FB1D2277FE5400A00744 /* AppDelegate.swift */; };
 		A4E4FB202277FE5400A00744 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E4FB1F2277FE5400A00744 /* ViewController.swift */; };
 		A4E4FB252277FE5900A00744 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A4E4FB242277FE5900A00744 /* Assets.xcassets */; };
@@ -20,11 +19,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A403407322934B3E006CB2F3 /* MtsEnroll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MtsEnroll.swift; sourceTree = "<group>"; };
 		A403407522934D3C006CB2F3 /* MTSHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTSHandler.swift; sourceTree = "<group>"; };
 		A4313E792283DB97001644BE /* MtsLogin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MtsLogin.swift; sourceTree = "<group>"; };
 		A4313E7B2283DB9F001644BE /* MessageTransferSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageTransferSystem.swift; sourceTree = "<group>"; };
-		A4313E7F2283E552001644BE /* RoomConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomConfig.swift; sourceTree = "<group>"; };
+		A4313E7F2283E552001644BE /* MtsRoomConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MtsRoomConfig.swift; sourceTree = "<group>"; };
 		A4E4FB1A2277FE5400A00744 /* MTS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MTS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4E4FB1D2277FE5400A00744 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A4E4FB1F2277FE5400A00744 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -58,10 +56,9 @@
 		A4313E782283DB85001644BE /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				A4313E792283DB97001644BE /* MtsLogin.swift */,
-				A4313E7F2283E552001644BE /* RoomConfig.swift */,
-				A403407322934B3E006CB2F3 /* MtsEnroll.swift */,
 				A4F8680122950F7300106DEE /* MtsKeys.swift */,
+				A4313E792283DB97001644BE /* MtsLogin.swift */,
+				A4313E7F2283E552001644BE /* MtsRoomConfig.swift */,
 			);
 			name = Entities;
 			sourceTree = "<group>";
@@ -174,12 +171,11 @@
 			files = (
 				A4E4FB202277FE5400A00744 /* ViewController.swift in Sources */,
 				A4E4FB3A227A903000A00744 /* OPL.swift in Sources */,
-				A403407422934B3E006CB2F3 /* MtsEnroll.swift in Sources */,
 				A403407622934D3C006CB2F3 /* MTSHandler.swift in Sources */,
 				A4E4FB1E2277FE5400A00744 /* AppDelegate.swift in Sources */,
 				A4313E7C2283DB9F001644BE /* MessageTransferSystem.swift in Sources */,
 				A4313E7A2283DB97001644BE /* MtsLogin.swift in Sources */,
-				A4313E802283E552001644BE /* RoomConfig.swift in Sources */,
+				A4313E802283E552001644BE /* MtsRoomConfig.swift in Sources */,
 				A4F8680222950F7300106DEE /* MtsKeys.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

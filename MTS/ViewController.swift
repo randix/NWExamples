@@ -12,6 +12,7 @@ import Network
 class ViewController: UIViewController {
     
     var client: MTSClient?
+    var roomNodeIds: RoomToNodeIds?
     
     var screenWidth: Int?
     var screenHeight: Int?
@@ -71,38 +72,63 @@ class ViewController: UIViewController {
     
     func connectCallback()
     {
-        let jsonEncoder = JSONEncoder()
-        var jsonData: Data
         if (useTls) {
+            Log("login to FrontDeskServer")
             // connected to FrontDeskServer -- get PP type stuff
-            // let login = Login(user:tfUser!.text!, password:tfPwd!.text!, appId:AppId.RMSRmNd, appKey:Data())
-            //        var jsonData : Data
-            //        do {
-            //            jsonData = try jsonEncoder.encode(login)
-            //        } catch {
-            //            print("json convert error")
-            //        }
-            //
-            //        client!.send(mtsMessage)
-            
+            let login = MtsLogin(user:tfUser!.text!, password:tfPwd!.text!, appId:AppId.RMSRmNd, appKey:Data())
+            let data = try! MTSHandler.MTSConvert(login)
+            let mtsMessage = MTSMessage(route: MTSRequest.Login, jwt: "jwt", data: data)
+            client!.send(mtsMessage)
         } else {
             // connected to RMSServer -- get Room NodeIds
-            Log("get Room data")
-            let rmReq = tfRoomId!.text
-            do {
-                jsonData = try jsonEncoder.encode(rmReq)
-            } catch {
-                Log("json convert error")
-            }
-//            let mtsRequest = MTSMessage(route: MTSRequest.RoomsMap, jwt: "", data: jsonData)
-//            do {
-//                jsonData = try jsonEncoder.encode(MTSRequest)
-//            } catch {
-//                Log("json convert error")
-//            }
-//            client!.sendAwait(jsonData)
+            Log("get room nodeIds")
+            let data = try! MTSHandler.MTSConvert(Room(tfRoomId!.text!))
+            let mtsMessage = MTSMessage(route: MTSRequest.RoomsMap, jwt: "jwt", data: data)
+            client!.send(mtsMessage)
         }
          displayConnected()
+    }
+    
+    func mtsReceiver(_ mtsMessage: MTSMessage) {
+        Log("mtsMessage \(mtsMessage)")
+        let decoder = JSONDecoder()
+        
+        print(mtsMessage.Route)
+        // OPL                  = 1   <->
+        // Login                = 2    ->
+        // LoginResponse        = 3   <-
+        // CommunicationKeyReq  = 4    ->
+        // PPCommunicationKeys  = 5   <-
+        // RMSCommunicationKeys = 6   <-
+        // RoomsMap             = 7   <->
+        // OplCommands          = 8   <->
+        switch MTSRequest(rawValue: mtsMessage.Route)! {
+        case .OPL:
+            break
+        case .LoginResponse:
+            let json = String(data: mtsMessage.Data, encoding: .utf8)!
+            Log(json)
+            let loginResponse = try! decoder.decode(MtsLoginResponse.self, from: mtsMessage.Data)
+            break
+        case .PPCommunicationKeys:
+            let ppCommunicationKeys = try! decoder.decode(PPCommunicationKeys.self, from: mtsMessage.Data)
+            break
+        case .RMSCommunicationKeys:
+            let loginResponse = try! decoder.decode(RMSCommunicationKeys.self, from: mtsMessage.Data)
+            break
+        case .RoomsMap:
+            let roomToNodeIds = try! decoder.decode([RoomToNodeIds].self, from: mtsMessage.Data)
+            for nodeId in roomToNodeIds[0].NodeIds {
+                Log("NodeId: \(nodeId)")
+            }
+            break
+        case .OplCommands:
+            let oplCommands = try! decoder.decode(OPLCommands.self, from: mtsMessage.Data)
+            break
+        default:
+            print(mtsMessage.Route)
+            break
+        }
     }
     
     @objc func buttonPing(sender: UIButton!) {
@@ -116,29 +142,7 @@ class ViewController: UIViewController {
         Log("disconnected")
     }
     
-    func mtsReceiver(_ mtsMessage: MTSMessage) {
-        Log("mtsMessage \(mtsMessage)")
-        let jsonDecoder = JSONDecoder()
-
-        print(mtsMessage.Route)
-        switch MTSRequest(rawValue: mtsMessage.Route)! {
-        case .Login:
-            break
-        case .OplCommands:
-            do {
-                //let oplCommands = try jsonDecoder.decode(OPLCommands.self, from: mtsMessage.Json.data(using: .utf8)!)
-            
-//                for (key, value) in oplCommands.OPLLists {
-//                    print("\(key) -> \(value)")
-//                }
-            } catch {
-                Log("OPLCommands json convert error")
-            }
-            break
-        default:
-            break
-        }
-    }
+   
     
     func Log(_ text: String) -> Void {
         let currentDateTime = Date()
@@ -161,7 +165,7 @@ class ViewController: UIViewController {
         tfURL = UITextField(frame: CGRect(x:inputOffset, y:topOffset+border, width:inputWidth, height:inputHeight))
         tfURL!.borderStyle = .roundedRect
         tfURL!.placeholder = "127.0.0.1:10002"
-        tfURL!.text = "172.20.10.5:10001"
+        tfURL!.text = "172.20.10.5:10002"
         //tfURL!.text = "172.20.10.5:10002"
         tfURL!.backgroundColor = UIColor.white
         tfURL!.textColor = UIColor.blue

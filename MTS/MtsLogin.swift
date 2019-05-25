@@ -28,11 +28,11 @@ struct MtsLogin : Codable {
     }
 }
 
-struct RMSLoginResponse : Codable {
+struct MtsLoginResponse : Codable {
     var NodeAuth: String
     var ClientCertificate: Data?
     var ServerCertInfo: String
-    var MtuBluetooh: Int
+    var MtuBluetooth: Int
     var MtuOpl: Int
     var MtuMts: Int
 }

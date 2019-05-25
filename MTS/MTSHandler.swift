@@ -23,14 +23,51 @@ struct MTSMessage: Codable {
 }
 
 enum MTSRequest: Int {
-    case Enroll               =  1
-    case Login                =  2
-    case LoginResponse        =  3
-    case CommunicationKeyReq  =  4
-    case PPCommunicationKeys  =  5
-    case RMSCommunicationKeys =  6
-    case RoomsMap             =  7
-    case NodeIdsMap           =  8
-    case OplCommands          =  9
-    case OPL                  = 10
+    case OPL                  = 1  // <->
+    case Login                = 2  //  ->
+    case LoginResponse        = 3  // <-
+    case CommunicationKeyReq  = 4  //  ->
+    case PPCommunicationKeys  = 5  // <-
+    case RMSCommunicationKeys = 6  // <-
+    case RoomsMap             = 7  // <->
+    case OplCommands          = 8  // <->
+}
+
+class MTSHandler {
+//    func MTSConvert<T:Codable>(_ data: Data) -> T? {
+//        var obj: T
+//        let jsonDecoder = JSONDecoder()
+//        do {
+//            obj = try jsonDecoder.decode(T.self, from: data)
+//            return obj
+//        } catch {
+//            print("json convert error")
+//        }
+//        return nil
+//    }
+    
+    static func MTSConvert(_ data: MTSMessage) throws -> Data {
+        let encoder = JSONEncoder()
+        return try! encoder.encode(data)
+    }
+    
+    static func MTSConvert(_ data: MtsLogin) throws -> Data {
+        let encoder = JSONEncoder()
+        return try! encoder.encode(data)
+    }
+    
+    static func MTSConvert(_ data: Room) throws -> Data {
+        let encoder = JSONEncoder()
+        return try! encoder.encode(data)
+    }
+    
+    static func MTSConvert(_ data: MtsCommunicationKeyReq) throws -> Data {
+        let encoder = JSONEncoder()
+        return try! encoder.encode(data)
+    }
+    
+    static func MTSConvert(_ data: OPLCommands) throws -> Data {
+        let encoder = JSONEncoder()
+        return try! encoder.encode(data)
+    }
 }

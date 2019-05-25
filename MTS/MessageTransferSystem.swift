@@ -47,12 +47,14 @@ class MTSClient {
         connectCallback = connCB
     }
     
+    @discardableResult
     func WithTLS(certificate: Data?) -> MTSClient {
         useTLS = true
         clientCertificate = certificate
         return self
     }
     
+    @discardableResult
     func WithProxy(ProxyURL: String, ProxyUser: String?, ProxyPassword: String?) -> MTSClient {
         let s = ProxyURL.components(separatedBy: ":")
         proxyHostname = s[0]
@@ -62,6 +64,7 @@ class MTSClient {
         return self
     }
     
+    @discardableResult
     func Connect() -> MTSClient {
         Log("connect to \(hostname):\(port) (TLS=\(useTLS))")
         // TODO client cert not implemented
@@ -75,7 +78,7 @@ class MTSClient {
             connection = NWConnection(host: myHost, port: myPort, using: .tcp)
         }
         connection!.stateUpdateHandler = stateDidChange(to:)
-        setupReceive(on: connection!)
+        setupReceive(on: connection)
         connection!.start(queue: .main)
         return self
     }
@@ -124,10 +127,11 @@ class MTSClient {
         return NWParameters(tls: options)
     }
     
-    func setupReceive(on connection: NWConnection) {
-        connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { (data, contentContext, isComplete, error) in
+    func setupReceive(on connection: NWConnection?) {
+        connection!.receive(minimumIncompleteLength: 1, maximumLength: 65536) { (data, contentContext, isComplete, error) in
             if var data = data, !data.isEmpty {
                 // … process the data …
+                print("receive")
                 self.Log("did receive \(data.count) \(self.expected) bytes")
                 if (self.buffer.count == 0 && self.expected == 0) {
                     self.expected  = Int(data.removeFirst())
@@ -160,6 +164,7 @@ class MTSClient {
                 self.Stop(status: "EOF")
             } else if let error = error {
                 // … handle error …
+                print("error")
                 self.connectionFailed(error: error)
             } else {
                 print("restart receiver")
@@ -191,10 +196,16 @@ class MTSClient {
             }
             print("processed")
         })))
+        print("send finished")
+    }
+    
+    func send(_ msg: MTSMessage) {
+        let data = try! MTSHandler.MTSConvert(msg)
+        send(data)
     }
     
     var obj: AnyObject?
-    func sendAwait(_ data: Data) -> AnyObject {
+    func sendWait(_ data: MTSMessage) -> AnyObject {
         waiting = true
         send(data);
         await.wait()
@@ -202,23 +213,27 @@ class MTSClient {
     }
     func waitReceiver(_ mtsMessage: MTSMessage) {
         Log("mtsMessage \(mtsMessage)")
-        let jsonDecoder = JSONDecoder()
         print(mtsMessage.Route)
+        let decoder = JSONDecoder()
+        
         switch MTSRequest(rawValue: mtsMessage.Route)! {
-        case .Login:
-            do {
-                //obj = try jsonDecoder.decode(RMSLoginResponse.self, from: mtsMessage.Json.data(using: .utf8)!) as AnyObject
-            } catch {
-                print("RMSLoginResponse json convert error")
-            }
+            
+        case .LoginResponse:
+            obj = try! decoder.decode(MtsLoginResponse.self, from: mtsMessage.Data) as AnyObject
             break
+            
+        case .PPCommunicationKeys:
+            obj = try! decoder.decode(PPCommunicationKeys.self, from: mtsMessage.Data) as AnyObject
+            break;
+            
+        case .RoomsMap:
+            obj = try! decoder.decode(RoomToNodeIds.self, from: mtsMessage.Data) as AnyObject
+            break;
+            
         case .OplCommands:
-            do {
-                //obj = try jsonDecoder.decode(OPLCommands.self, from: mtsMessage.Json.data(using: .utf8)!) as AnyObject
-            } catch {
-                print("OPLCommands json convert error")
-            }
+            obj = try! decoder.decode(OPLCommands.self, from: mtsMessage.Data) as AnyObject
             break
+
         default:
             break
         }
@@ -226,6 +241,7 @@ class MTSClient {
         await.signal()
     }
     
+    // unused?
     func sendEndOfStream() {
         connection!.send(content: nil, contentContext: .defaultStream, isComplete: true, completion: .contentProcessed({ error in
             if let error = error {
@@ -233,5 +249,4 @@ class MTSClient {
             }
         }))
     }
-    
 }
