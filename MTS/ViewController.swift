@@ -89,6 +89,11 @@ class ViewController: UIViewController {
             let login = MtsLogin(user:tfUser!.text!, password:tfPwd!.text!, appId:AppId.RMSRmNd, appKey:Data())
             let data = try! MTSHandler.MTSConvert(login)
             mtsMessage = MTSMessage(route: MTSRequest.Login, jwt: "jwt", data: data)
+            if let lr = loginResponse {
+                if lr.ClientCertificate != nil {
+                    loginWithCertDone = true
+                }
+            }
         } else {
             // connected to RMSServer -- get Room NodeIds
             Log("get room nodeIds")
@@ -128,7 +133,7 @@ class ViewController: UIViewController {
             loginResponse = lr
             if !loginWithCertDone && loginResponse!.ClientCertificate != nil {
                 // TODO -- PP
-                client!.Stop("relogin")
+                client!.Stop("have cert")
                 // 2: new client
                 client = MTSClient(log: Log, url: tfURL!.text!, mtsRcvr: mtsReceiver, connCB: connectCallback)
                     .WithTLS(loginResponse!.ClientCertificate)

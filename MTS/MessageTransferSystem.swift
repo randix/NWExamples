@@ -174,7 +174,8 @@ class MTSClient {
     }
     
     func Stop(_ status: String) {
-        print("status \(status)")
+        print("stopping \(status)")
+        sendEndOfStream()
     }
     
     func connectionFailed(error: NWError?) {
