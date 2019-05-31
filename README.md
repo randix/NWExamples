@@ -4,7 +4,8 @@
 
 There is currently a dearth of examples for Apple's Network Framework libraries. And the Apple documentation is at the level of "expert" documentation. 
 
-A version of this was written in C#, this version is designed to run on iOS and macOS. 
+A version of this was written in C#, contact the author if that might be useful.
+This version in Swift is designed to run on iOS and macOS. 
 
 The purpose was to a very lightweight RPC system. This works very similar to a WebSocket, only it starts as a clean transport system, whereas a WebSocket could be considered as an enhancement to an HTTP/HTTPS server. This eliminates all of the overhead of the HTTP/HTTPS server.
 
