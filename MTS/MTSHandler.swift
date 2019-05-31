@@ -40,4 +40,27 @@ class MTSHandler {
         let encoder = JSONEncoder()
         return try! encoder.encode(data)
     }
+    
+    
+//    switch MTSRequest(rawValue: mtsMessage.Route)! {
+//    
+//    case .LoginResponse:
+//    obj = try! decoder.decode(MtsLoginResponse.self, from: mtsMessage.Data) as AnyObject
+//    break
+//    
+//    case .PPCommunicationKeys:
+//    obj = try! decoder.decode(PPCommunicationKeys.self, from: mtsMessage.Data) as AnyObject
+//    break;
+//    
+//    case .RoomsMap:
+//    obj = try! decoder.decode(RoomToNodeIds.self, from: mtsMessage.Data) as AnyObject
+//    break;
+//    
+//    case .OplCommands:
+//    obj = try! decoder.decode(OPLCommands.self, from: mtsMessage.Data) as AnyObject
+//    break
+//    
+//    default:
+//    break
+//    }
 }

@@ -10,19 +10,21 @@
 import Foundation
 import Network
 
-class MTS {
-    static func convert (_ data: MTSMessage) throws -> Data {
-        let encoder = JSONEncoder()
-        return try! encoder.encode(data)
-    }
+// helper functions
+func convert(_ from: MTSMessage) throws -> Data {
+    return try! JSONEncoder().encode(from)
 }
 
+func convert(_ from: Data) throws -> MTSMessage {
+    return try! JSONDecoder().decode(MTSMessage.self, from: from)
+}
+
+// primary message structure
 struct MTSMessage: Codable {
     var Route: Int
     var JWT: String
     var Data: Data
     var Reply: Bool
-    
     
     init(route: MTSRequest, jwt: String, data: Data, reply: Bool = false) {
         Route = route.rawValue
@@ -33,6 +35,30 @@ struct MTSMessage: Codable {
 }
 
 class MTSServer {
+    
+    init(log: @escaping (_ log: String) -> Void, port: UInt16, mtsReceiver: @escaping (_ from: MTSClient, _ receive: MTSMessage) -> Void) {
+        
+    }
+    
+    func withTLS(certificate: Data, clientCertificateRequired: Bool) -> MTSServer {
+        return self
+    }
+    
+    func clientCertificateRequired(_ flag: Bool) -> Void {
+        
+    }
+    
+    func start() -> MTSServer {
+        return self
+    }
+    
+    func stop() -> Void {
+        
+    }
+    
+    func send(_ message: MTSMessage) {
+        
+    }
     
 }
 
@@ -63,12 +89,12 @@ class MTSClient {
     
     var Log: (_ log: String) -> Void
     
-    init(log: @escaping (_ log: String) -> Void, url: String, mtsRcvr: @escaping (_ receive: MTSMessage) -> Void, connCB: @escaping () -> Void) {
+    init(log: @escaping (_ log: String) -> Void, url: String, mtsReceiver: @escaping (_ receive: MTSMessage) -> Void, connCB: @escaping () -> Void) {
         Log = log
         let s = url.components(separatedBy: ":")
         hostname = s[0]
         port = UInt16(s[1])!
-        mtsReceiver = mtsRcvr
+        self.mtsReceiver = mtsReceiver
         connectCallback = connCB
     }
     

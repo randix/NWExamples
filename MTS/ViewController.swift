@@ -73,7 +73,7 @@ class ViewController: UIViewController {
             Log("Connecting (no TLS) ...")
         }
         
-        client = MTSClient(log: Log, url: tfURL!.text!, mtsRcvr: mtsReceiver, connCB: connectCallback)
+        client = MTSClient(log: Log, url: tfURL!.text!, mtsReceiver: mtsReceiver, connCB: connectCallback)
         if (useTls) {
             client!.WithTLS(nil)
         }
@@ -135,7 +135,7 @@ class ViewController: UIViewController {
                 // TODO -- PP
                 client!.Stop("have cert")
                 // 2: new client
-                client = MTSClient(log: Log, url: tfURL!.text!, mtsRcvr: mtsReceiver, connCB: connectCallback)
+                client = MTSClient(log: Log, url: tfURL!.text!, mtsReceiver: mtsReceiver, connCB: connectCallback)
                     .WithTLS(loginResponse!.ClientCertificate)
                 client!.Connect()
                 return
@@ -149,7 +149,7 @@ class ViewController: UIViewController {
             break
             
         case .PPCommunicationKeys:
-            let ppCommunicationKeys = try! decoder.decode(PPCommunicationKeys.self, from: mtsMessage.Data)
+            //let ppCommunicationKeys = try! decoder.decode(PPCommunicationKeys.self, from: mtsMessage.Data)
             // TODO -- PP
             
             break
@@ -173,7 +173,7 @@ class ViewController: UIViewController {
             break
             
         case .OplCommands:
-            let oplCommands = try! decoder.decode(OPLCommands.self, from: mtsMessage.Data)
+            //let oplCommands = try! decoder.decode(OPLCommands.self, from: mtsMessage.Data)
             // TODO -- PP
             
             break
