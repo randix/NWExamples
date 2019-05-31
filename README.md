@@ -16,6 +16,7 @@ There are client and server classes for TCP and UDP examples of using the Networ
 
 ### MTSMessage
 
+<pre>
 enum MTSRequest {
     case RPC1         // user defined RPCs
     case RMC2
@@ -27,12 +28,16 @@ class MTSMessage {
     Reply: Bool
     Data: Data 
 }
+</pre>
 
 ### TCP Server
 
+This supports multiple incoming clients. 
+
+<pre>
 class MTSServer
 
-init(log: (_ log: String) -> Void, port: UInt16, mtsReceiver: (_ receive: MTSMessage) -> Void)
+init(log: (_ log: String) -> Void, port: UInt16, mtsReceiver: (_ from: MTSClient, receive: MTSMessage) -> Void)
 
 func withTLS(certificate: Data, clientCertificateRequired: Bool) -> MTSServer
 
@@ -42,8 +47,12 @@ func start() -> MTSServer
 
 func stop() -> Void
 
+func send(_ message: MTSMessage)
+</pre>
+
 ### TCP Client
 
+<pre>
 class MTSClient
 
 init(_ log: (_ log: String) -> Void, url: String, mtsReceiver: (_ receive: MTSMessage) -> Void) 
@@ -57,3 +66,48 @@ func withProxy(_ proxyURL: String, proxyUser: String?, proxyPassword: String?) -
 func Connect() -> MTSClient
 
 func Stop() -> Void
+
+func send(_ message: MTSMessage)
+</pre>
+
+### UDP Server
+
+This supports only one client per port, and does not try to support any UDP proxies.
+
+<pre>
+class UDPServer
+
+init(_ log: (_ log: String) -> Void, port: UInt16, udpReceiver: (_ receive: Data) -> Void)
+
+func withTLS(certificate: Data, clientCertificateRequired: Bool) -> UDPServer
+
+func clientCertificateRequired(_ flag: Bool) -> Void
+
+func start() -> UDPServer
+
+func stop() -> Void
+
+func send(_ message: Data)
+  
+</pre>
+
+### UDP Client
+
+<pre>
+class UDPClient
+
+init(_ log: (_ log: String) -> Void, url: String, udpReceiver: (_ receive: Data) -> Void)
+
+init(_ log: (_ log: String) -> Void, hostname: String, port: UInt16, mtsReceiver: (_ receive: Data) -> Void) 
+
+func withTLS(certificate: Data, clientCertificateRequired: Bool) -> UDPClient
+
+func clientCertificateRequired(_ flag: Bool) -> Void
+
+func start() -> UDPServer
+
+func stop() -> Void
+
+func send(_ message: Data)
+</pre>
+
