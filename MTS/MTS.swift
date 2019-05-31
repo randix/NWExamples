@@ -10,6 +10,31 @@
 import Foundation
 import Network
 
+class MTS {
+    static func convert (_ data: MTSMessage) throws -> Data {
+        let encoder = JSONEncoder()
+        return try! encoder.encode(data)
+    }
+}
+
+struct MTSMessage: Codable {
+    var Route: Int
+    var JWT: String
+    var Data: Data
+    var Reply: Bool
+    
+    
+    init(route: MTSRequest, jwt: String, data: Data, reply: Bool = false) {
+        Route = route.rawValue
+        JWT = jwt
+        Data = data
+        Reply = reply
+    }
+}
+
+class MTSServer {
+    
+}
 
 class MTSClient {
     
@@ -144,16 +169,12 @@ class MTSClient {
                 self.Log("have \(self.buffer.count) expected \(self.expected)")
                 if (self.buffer.count == self.expected) {
                     let jsonDecoder = JSONDecoder()
-                    var mtsMessage: MTSMessage?
-                    do {
-                        mtsMessage = try jsonDecoder.decode(MTSMessage.self, from: self.buffer)
-                    } catch {
-                        print("receive json convert error")
-                    }
-                    if (self.waiting && mtsMessage!.Reply) {
-                        self.waitReceiver(mtsMessage!)
+                    let mtsMessage = try! jsonDecoder.decode(MTSMessage.self, from: self.buffer)
+             
+                    if (self.waiting && mtsMessage.Reply) {
+                        self.waitReceiver(mtsMessage)
                     } else {
-                        self.mtsReceiver(mtsMessage!)
+                        self.mtsReceiver(mtsMessage)
                     }
                     self.buffer = Data()
                     self.expected = 0
@@ -201,7 +222,7 @@ class MTSClient {
     }
     
     func send(_ msg: MTSMessage) {
-        let data = try! MTSHandler.MTSConvert(msg)
+        let data = try! MTS.convert(msg)
         send(data)
     }
     

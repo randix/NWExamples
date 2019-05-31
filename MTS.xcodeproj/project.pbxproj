@@ -9,26 +9,30 @@
 /* Begin PBXBuildFile section */
 		A403407622934D3C006CB2F3 /* MTSHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A403407522934D3C006CB2F3 /* MTSHandler.swift */; };
 		A4313E7A2283DB97001644BE /* MtsLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4313E792283DB97001644BE /* MtsLogin.swift */; };
-		A4313E7C2283DB9F001644BE /* MessageTransferSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4313E7B2283DB9F001644BE /* MessageTransferSystem.swift */; };
+		A4313E7C2283DB9F001644BE /* MTS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4313E7B2283DB9F001644BE /* MTS.swift */; };
 		A4313E802283E552001644BE /* MtsRoomConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4313E7F2283E552001644BE /* MtsRoomConfig.swift */; };
+		A487D56C22A192C200FE5DE7 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = A487D56A22A192C200FE5DE7 /* LICENSE */; };
+		A487D56D22A192C200FE5DE7 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = A487D56B22A192C200FE5DE7 /* README.md */; };
 		A4E4FB1E2277FE5400A00744 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E4FB1D2277FE5400A00744 /* AppDelegate.swift */; };
 		A4E4FB202277FE5400A00744 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E4FB1F2277FE5400A00744 /* ViewController.swift */; };
 		A4E4FB252277FE5900A00744 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A4E4FB242277FE5900A00744 /* Assets.xcassets */; };
-		A4E4FB3A227A903000A00744 /* OPL.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E4FB39227A903000A00744 /* OPL.swift */; };
+		A4E4FB3A227A903000A00744 /* UDP.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4E4FB39227A903000A00744 /* UDP.swift */; };
 		A4F8680222950F7300106DEE /* MtsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F8680122950F7300106DEE /* MtsKeys.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A403407522934D3C006CB2F3 /* MTSHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTSHandler.swift; sourceTree = "<group>"; };
 		A4313E792283DB97001644BE /* MtsLogin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MtsLogin.swift; sourceTree = "<group>"; };
-		A4313E7B2283DB9F001644BE /* MessageTransferSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageTransferSystem.swift; sourceTree = "<group>"; };
+		A4313E7B2283DB9F001644BE /* MTS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MTS.swift; sourceTree = "<group>"; };
 		A4313E7F2283E552001644BE /* MtsRoomConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MtsRoomConfig.swift; sourceTree = "<group>"; };
+		A487D56A22A192C200FE5DE7 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		A487D56B22A192C200FE5DE7 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A4E4FB1A2277FE5400A00744 /* MTS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MTS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4E4FB1D2277FE5400A00744 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A4E4FB1F2277FE5400A00744 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		A4E4FB242277FE5900A00744 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A4E4FB292277FE5900A00744 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A4E4FB39227A903000A00744 /* OPL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OPL.swift; sourceTree = "<group>"; };
+		A4E4FB39227A903000A00744 /* UDP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDP.swift; sourceTree = "<group>"; };
 		A4F8680122950F7300106DEE /* MtsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MtsKeys.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -43,30 +47,35 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A4313E772283DB6F001644BE /* MessageTransferSystem */ = {
+		A4313E772283DB6F001644BE /* MTS */ = {
 			isa = PBXGroup;
 			children = (
-				A4313E7B2283DB9F001644BE /* MessageTransferSystem.swift */,
-				A4313E782283DB85001644BE /* Entities */,
-				A403407522934D3C006CB2F3 /* MTSHandler.swift */,
+				A4313E7B2283DB9F001644BE /* MTS.swift */,
 			);
-			name = MessageTransferSystem;
+			path = MTS;
 			sourceTree = "<group>";
 		};
-		A4313E782283DB85001644BE /* Entities */ = {
+		A4313E782283DB85001644BE /* AppEntities */ = {
 			isa = PBXGroup;
 			children = (
+				A403407522934D3C006CB2F3 /* MTSHandler.swift */,
 				A4F8680122950F7300106DEE /* MtsKeys.swift */,
 				A4313E792283DB97001644BE /* MtsLogin.swift */,
 				A4313E7F2283E552001644BE /* MtsRoomConfig.swift */,
 			);
-			name = Entities;
+			name = AppEntities;
+			path = MTS;
 			sourceTree = "<group>";
 		};
 		A4E4FB112277FE5400A00744 = {
 			isa = PBXGroup;
 			children = (
+				A487D56A22A192C200FE5DE7 /* LICENSE */,
+				A487D56B22A192C200FE5DE7 /* README.md */,
 				A4E4FB1C2277FE5400A00744 /* MTS */,
+				A4313E782283DB85001644BE /* AppEntities */,
+				A4313E772283DB6F001644BE /* MTS */,
+				A4E4FB38227A900F00A00744 /* UDP */,
 				A4E4FB1B2277FE5400A00744 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -82,8 +91,6 @@
 		A4E4FB1C2277FE5400A00744 /* MTS */ = {
 			isa = PBXGroup;
 			children = (
-				A4313E772283DB6F001644BE /* MessageTransferSystem */,
-				A4E4FB38227A900F00A00744 /* OPL */,
 				A4E4FB1D2277FE5400A00744 /* AppDelegate.swift */,
 				A4E4FB1F2277FE5400A00744 /* ViewController.swift */,
 				A4E4FB242277FE5900A00744 /* Assets.xcassets */,
@@ -92,12 +99,12 @@
 			path = MTS;
 			sourceTree = "<group>";
 		};
-		A4E4FB38227A900F00A00744 /* OPL */ = {
+		A4E4FB38227A900F00A00744 /* UDP */ = {
 			isa = PBXGroup;
 			children = (
-				A4E4FB39227A903000A00744 /* OPL.swift */,
+				A4E4FB39227A903000A00744 /* UDP.swift */,
 			);
-			path = OPL;
+			path = UDP;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -158,6 +165,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A487D56D22A192C200FE5DE7 /* README.md in Resources */,
+				A487D56C22A192C200FE5DE7 /* LICENSE in Resources */,
 				A4E4FB252277FE5900A00744 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -170,10 +179,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				A4E4FB202277FE5400A00744 /* ViewController.swift in Sources */,
-				A4E4FB3A227A903000A00744 /* OPL.swift in Sources */,
+				A4E4FB3A227A903000A00744 /* UDP.swift in Sources */,
 				A403407622934D3C006CB2F3 /* MTSHandler.swift in Sources */,
 				A4E4FB1E2277FE5400A00744 /* AppDelegate.swift in Sources */,
-				A4313E7C2283DB9F001644BE /* MessageTransferSystem.swift in Sources */,
+				A4313E7C2283DB9F001644BE /* MTS.swift in Sources */,
 				A4313E7A2283DB97001644BE /* MtsLogin.swift in Sources */,
 				A4313E802283E552001644BE /* MtsRoomConfig.swift in Sources */,
 				A4F8680222950F7300106DEE /* MtsKeys.swift in Sources */,
@@ -311,7 +320,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.utc.MTS;
+				PRODUCT_BUNDLE_IDENTIFIER = net.randix.MTS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -328,7 +337,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.utc.MTS;
+				PRODUCT_BUNDLE_IDENTIFIER = net.randix.MTS;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

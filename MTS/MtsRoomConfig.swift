@@ -41,3 +41,8 @@ enum OPLListType:Int {
 struct OPLCommands : Codable {
     var OPLLists: Dictionary<Int, [Data]>
 }
+
+func MTSConvert(_ data: Room) throws -> Data {
+    let encoder = JSONEncoder()
+    return try! encoder.encode(data)
+}

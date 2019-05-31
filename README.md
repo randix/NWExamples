@@ -26,8 +26,8 @@ enum MTSRequest {
 class MTSMessage {
     route: MTSRequest
     jwt: String
-    Reply: Bool
-    Data: Data 
+    rata: Data 
+    reply: Bool = false
 }
 </pre>
 

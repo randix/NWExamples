@@ -8,20 +8,6 @@
 
 import Foundation
 
-struct MTSMessage: Codable {
-    var Route: Int
-    var JWT: String
-    var Data: Data
-    var Reply: Bool
-    
-    init(route: MTSRequest, jwt: String, data: Data, reply: Bool = false) {
-        Route = route.rawValue
-        JWT = jwt
-        Data = data
-        Reply = reply
-    }
-}
-
 enum MTSRequest: Int {
     case OPL                  = 1  // <->
     case Login                = 2  //  ->
@@ -34,22 +20,6 @@ enum MTSRequest: Int {
 }
 
 class MTSHandler {
-//    func MTSConvert<T:Codable>(_ data: Data) -> T? {
-//        var obj: T
-//        let jsonDecoder = JSONDecoder()
-//        do {
-//            obj = try jsonDecoder.decode(T.self, from: data)
-//            return obj
-//        } catch {
-//            print("json convert error")
-//        }
-//        return nil
-//    }
-    
-    static func MTSConvert(_ data: MTSMessage) throws -> Data {
-        let encoder = JSONEncoder()
-        return try! encoder.encode(data)
-    }
     
     static func MTSConvert(_ data: MtsLogin) throws -> Data {
         let encoder = JSONEncoder()
