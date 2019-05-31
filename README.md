@@ -25,8 +25,8 @@ enum MTSRequest {
     
 class MTSMessage {
     route: MTSRequest
-    jwt: String
-    rata: Data 
+    jwt: String         // JSON Web Token (if desired)
+    data: Data 
     reply: Bool = false
 }
 </pre>
@@ -38,9 +38,9 @@ This supports multiple incoming clients.
 <pre>
 class MTSServer
 
-init(log: (_ log: String) -> Void, port: UInt16, mtsReceiver: (_ from: MTSClient, receive: MTSMessage) -> Void)
+init(log: (_ log: String) -> Void, port: UInt16,  mtsAccept: (_ from: MTSClient) -> Void, mtsReceive: (_ from: MTSClient, receive: MTSMessage) -> Void)
 
-func withTLS(certificate: Data, clientCertificateRequired: Bool) -> MTSServer
+func withTLS(certificate: Data, clientCertificateRequired: Bool = false) -> MTSServer
 
 func clientCertificateRequired(_ flag: Bool) -> Void
 
@@ -48,7 +48,7 @@ func start() -> MTSServer
 
 func stop() -> Void
 
-func send(_ message: MTSMessage)
+func send(_ message: MTSMessage, to: MTSClient)
 </pre>
 
 ### TCP Client
@@ -56,31 +56,29 @@ func send(_ message: MTSMessage)
 <pre>
 class MTSClient
 
-init(_ log: (_ log: String) -> Void, url: String, mtsReceiver: (_ receive: MTSMessage) -> Void) 
-
-init(_ log: (_ log: String) -> Void, hostname: String, port: UInt16, mtsReceiver: (_ receive: MTSMessage) -> Void) 
+init(_ log: (_ log: String) -> Void, url: String, mtsConnect: () -> Void, mtsReceive: (_ receive: MTSMessage) -> Void, mtsDisconnect: () -> Void) 
 
 func withTLS(_ certificate: Data?) -> MTSClient
 
 func withProxy(_ proxyURL: String, proxyUser: String?, proxyPassword: String?) -> MTSClient
 
-func Connect() -> MTSClient
+func connect() -> MTSClient
 
-func Stop() -> Void
+func stop() -> Void
 
 func send(_ message: MTSMessage)
 </pre>
 
 ### UDP Server
 
-This supports only one client per port, and does not try to support any UDP proxies.
+This supports only one client per port, and does not support UDP proxies.
 
 <pre>
 class UDPServer
 
-init(_ log: (_ log: String) -> Void, port: UInt16, udpReceiver: (_ receive: Data) -> Void)
+init(_ log: (_ log: String) -> Void, port: UInt16, udpReceiver: (_ from: UDPClient, _ receive: Data) -> Void)
 
-func withTLS(certificate: Data, clientCertificateRequired: Bool) -> UDPServer
+func withTLS(certificate: Data, clientCertificateRequired: Bool = false) -> UDPServer
 
 func clientCertificateRequired(_ flag: Bool) -> Void
 
@@ -98,12 +96,6 @@ func send(_ message: Data)
 class UDPClient
 
 init(_ log: (_ log: String) -> Void, url: String, udpReceiver: (_ receive: Data) -> Void)
-
-init(_ log: (_ log: String) -> Void, hostname: String, port: UInt16, mtsReceiver: (_ receive: Data) -> Void) 
-
-func withTLS(certificate: Data, clientCertificateRequired: Bool) -> UDPClient
-
-func clientCertificateRequired(_ flag: Bool) -> Void
 
 func start() -> UDPServer
 

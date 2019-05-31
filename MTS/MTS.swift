@@ -4,8 +4,6 @@
 //
 //  Created by Rand Dow on 5/1/19.
 //  Copyright © 2019 Rand Dow. All rights reserved.
-//
-// THIS IS A CLIENT ONLY IMPLEMENTATION
 
 import Foundation
 import Network
@@ -36,19 +34,39 @@ struct MTSMessage: Codable {
 
 class MTSServer {
     
-    init(log: @escaping (_ log: String) -> Void, port: UInt16, mtsReceiver: @escaping (_ from: MTSClient, _ receive: MTSMessage) -> Void) {
+    private let log: (_ log: String) -> Void
+    private let port: UInt16
+    private let mtsAccept: (_ client: MTSClient) -> Void
+    private let mtsReceive: (_ from: MTSClient, _ message: MTSMessage) -> Void
+    
+    private var certificate: Data?
+    private var clientCertRequired = false
+    
+    init(log: @escaping (_ log: String) -> Void, port: UInt16, mtsAccept: @escaping (_ client: MTSClient) -> Void, mtsReceive: @escaping (_ from: MTSClient, _ receive: MTSMessage) -> Void) {
+        self.log = log
+        self.port = port
+        self.mtsAccept = mtsAccept
+        self.mtsReceive = mtsReceive
+        
+        
+        
         
     }
     
+    @discardableResult
     func withTLS(certificate: Data, clientCertificateRequired: Bool) -> MTSServer {
+        self.certificate = certificate
+        clientCertRequired = clientCertificateRequired
         return self
     }
     
-    func clientCertificateRequired(_ flag: Bool) -> Void {
-        
+    func clientCertificateRequired(_ clientCertificateRequired: Bool) -> Void {
+        clientCertRequired = clientCertificateRequired
     }
     
+    @discardableResult
     func start() -> MTSServer {
+        
         return self
     }
     
@@ -56,7 +74,7 @@ class MTSServer {
         
     }
     
-    func send(_ message: MTSMessage) {
+    func send(_ message: MTSMessage, to: MTSClient) -> Void {
         
     }
     
@@ -64,49 +82,51 @@ class MTSServer {
 
 class MTSClient {
     
+    private let log: (_ log: String) -> Void
+    private let url: URL
+    private let mtsConnect: () -> Void
+    private let mtsReceive: (_ receive: MTSMessage) -> Void
+    private let mtsDisconnect: () -> Void
+    
+    private var connection: NWConnection?
     var connected = false
-    var hostname: String
-    var port: UInt16
-    var mtsReceiver: (_ receive: MTSMessage) -> Void
-    var connectCallback: () -> Void
     
-    var useTLS = false
-    var clientCertificate: Data?
+    private var useTLS = false
+    private var clientCertificate: Data?
     
-    var proxyHostname: String?
-    var proxyPort: UInt16?
-    var proxyUser: String?
-    var proxyPassword: String?
-    var proxyTransactComplete = false
+    private var proxyHostname: String?
+    private var proxyPort: UInt16?
+    private var proxyUser: String?
+    private var proxyPassword: String?
+    private var proxyTransactComplete = false
     
-    var connection: NWConnection?
+    private let await = DispatchSemaphore(value: 0)
+    private var waiting = false
     
-    let await = DispatchSemaphore(value: 0)
-    var waiting = false
+    private var buffer = Data()
+    private var expected = 0
     
-    var buffer = Data()
-    var expected = 0
-    
-    var Log: (_ log: String) -> Void
-    
-    init(log: @escaping (_ log: String) -> Void, url: String, mtsReceiver: @escaping (_ receive: MTSMessage) -> Void, connCB: @escaping () -> Void) {
-        Log = log
-        let s = url.components(separatedBy: ":")
-        hostname = s[0]
-        port = UInt16(s[1])!
-        self.mtsReceiver = mtsReceiver
-        connectCallback = connCB
+    init(log: @escaping (_ log: String) -> Void,
+         url: String,
+         mtsConnect: @escaping () -> Void,
+         mtsReceive: @escaping (_ receive: MTSMessage) -> Void,
+         mtsDisconnect: @escaping () -> Void) {
+        self.log = log
+        self.url = URL(string: url)!
+        self.mtsConnect = mtsConnect
+        self.mtsReceive = mtsReceive
+        self.mtsDisconnect = mtsDisconnect
     }
-    
+
     @discardableResult
-    func WithTLS(_ certificate: Data?) -> MTSClient {
+    func withTLS(_ certificate: Data?) -> MTSClient {
         useTLS = true
         clientCertificate = certificate
         return self
     }
     
     @discardableResult
-    func WithProxy(_ ProxyURL: String, ProxyUser: String?, ProxyPassword: String?) -> MTSClient {
+    func withProxy(_ ProxyURL: String, ProxyUser: String?, ProxyPassword: String?) -> MTSClient {
         let s = ProxyURL.components(separatedBy: ":")
         proxyHostname = s[0]
         proxyPort = UInt16(s[1])!
@@ -116,15 +136,14 @@ class MTSClient {
     }
     
     @discardableResult
-    func Connect() -> MTSClient {
-        Log("connect to \(hostname):\(port) (TLS=\(useTLS))")
+    func connect() -> MTSClient {
+        log("connect to \(url.host!):\(url.port!) (TLS=\(useTLS))")
         // TODO client cert not implemented
         // TODO proxy not implemented
-        let myHost = NWEndpoint.Host(hostname)
-        let myPort =  NWEndpoint.Port(rawValue: UInt16(port))!
+        let myHost = NWEndpoint.Host(url.host!)
+        let myPort =  NWEndpoint.Port(rawValue: UInt16(url.port!))!
         if useTLS {
-            connection = NWConnection(host: myHost, port: myPort,// using: .tls)
-                    using: createTLSParameters(allowInsecure: true, queue: .main))
+            connection = NWConnection(host: myHost, port: myPort, using: createTLSParameters(allowInsecure: true, queue: .main))
         } else {
             connection = NWConnection(host: myHost, port: myPort, using: .tcp)
         }
@@ -138,24 +157,24 @@ class MTSClient {
         switch (newState) {
         case .ready:
             // Handle connection established
-            Log("connected")
+            log("connected")
             self.connected = true
-            connectCallback()
+            mtsConnect()
             break
         case .waiting(let error):
             // Handle connection waiting for network
-            Log("waiting \(error)")
+            log("waiting \(error)")
             break
         case .failed(let error):
             // Handle fatal connection error
-            Log("failed \(error)")
+            log("failed \(error)")
             break
         case .preparing:
             // Handle fatal connection error
-            Log("preparing")
+            log("preparing")
             break
         default:
-            Log("default \(newState)")
+            log("default \(newState)")
             break
         }
     }
@@ -183,16 +202,16 @@ class MTSClient {
             if var data = data, !data.isEmpty {
                 // … process the data …
                 print("receive")
-                self.Log("did receive \(data.count) \(self.expected) bytes")
+                self.log("did receive \(data.count) \(self.expected) bytes")
                 if (self.buffer.count == 0 && self.expected == 0) {
                     self.expected  = Int(data.removeFirst())
                     self.expected |= Int(data.removeFirst()) << 8
                     self.expected |= Int(data.removeFirst()) << 16
                     self.expected |= Int(data.removeFirst()) << 24
-                    self.Log("expected: \(self.expected) bytes")
+                    self.log("expected: \(self.expected) bytes")
                 }
                 self.buffer.append(data)
-                self.Log("have \(self.buffer.count) expected \(self.expected)")
+                self.log("have \(self.buffer.count) expected \(self.expected)")
                 if (self.buffer.count == self.expected) {
                     let jsonDecoder = JSONDecoder()
                     let mtsMessage = try! jsonDecoder.decode(MTSMessage.self, from: self.buffer)
@@ -200,7 +219,7 @@ class MTSClient {
                     if (self.waiting && mtsMessage.Reply) {
                         self.waitReceiver(mtsMessage)
                     } else {
-                        self.mtsReceiver(mtsMessage)
+                        self.mtsReceive(mtsMessage)
                     }
                     self.buffer = Data()
                     self.expected = 0
@@ -260,7 +279,7 @@ class MTSClient {
         return obj!
     }
     func waitReceiver(_ mtsMessage: MTSMessage) {
-        Log("mtsMessage \(mtsMessage)")
+        log("mtsMessage \(mtsMessage)")
         print(mtsMessage.Route)
         let decoder = JSONDecoder()
         

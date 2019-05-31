@@ -73,14 +73,14 @@ class ViewController: UIViewController {
             Log("Connecting (no TLS) ...")
         }
         
-        client = MTSClient(log: Log, url: tfURL!.text!, mtsReceiver: mtsReceiver, connCB: connectCallback)
+        client = MTSClient(log: Log, url: tfURL!.text!, mtsConnect: mtsConnect, mtsReceive: mtsReceive, mtsDisconnect: mtsDisconnect)
         if (useTls) {
-            client!.WithTLS(nil)
+            client!.withTLS(nil)
         }
-        client!.Connect()
+        client!.connect()
     }
     
-    func connectCallback()
+    func mtsConnect()
     {
         var mtsMessage: MTSMessage
         if (useTls) {
@@ -104,9 +104,13 @@ class ViewController: UIViewController {
         displayConnected()
     }
     
+    func mtsDisconnect() {
+        Log("Disconnected")
+    }
+    
     // This is the main driver of the RoomNode app
     // The PP will have a UI
-    func mtsReceiver(_ mtsMessage: MTSMessage) {
+    func mtsReceive(_ mtsMessage: MTSMessage) {
         Log("mtsMessage \(mtsMessage)")
         let decoder = JSONDecoder()
         
@@ -135,9 +139,9 @@ class ViewController: UIViewController {
                 // TODO -- PP
                 client!.Stop("have cert")
                 // 2: new client
-                client = MTSClient(log: Log, url: tfURL!.text!, mtsReceiver: mtsReceiver, connCB: connectCallback)
-                    .WithTLS(loginResponse!.ClientCertificate)
-                client!.Connect()
+                client = MTSClient(log: Log, url: tfURL!.text!, mtsConnect: mtsConnect, mtsReceive: mtsReceive, mtsDisconnect: mtsDisconnect)
+                    .withTLS(loginResponse!.ClientCertificate)
+                client!.connect()
                 return
             }
             if roomMap == nil {

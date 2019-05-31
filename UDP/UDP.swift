@@ -11,20 +11,57 @@ import Network
 
 class UDPServer {
     
+    private let log: (_ log: String) -> Void
+    private let listener: NWListener
+    private let port: UInt16
+    private let udpReceiver: (_ receive: Data) -> Void
+    
+    private var clientCertificate: Data?
+    private var clientCertRequired = false
+    
+    private var connection: NWConnection?
+    
     init(_ log: @escaping (_  log: String) -> Void, port: UInt16, udpReceiver: @escaping(_ receive: Data) -> Void) {
-        
+        self.log = log
+        self.port = port
+        self.udpReceiver = udpReceiver
+
+        let p = NWParameters.udp
+        p.allowLocalEndpointReuse = true
+        listener = try! NWListener(using: p, on: NWEndpoint.Port(rawValue: port)!)
     }
     
-    func withTLS(certificate: Data, clientCertificateRequired: Bool) -> UDPServer {
-        
+    func withTLS(certificate: Data, clientCertificateRequired: Bool = false) -> UDPServer {
+        clientCertificate = certificate
+        clientCertRequired = clientCertificateRequired
         return self
     }
     
-    func clientCertificateRequired(_ flag: Bool) -> Void {
-        
+    func clientCertificateRequired(_ clientCertificateRequired: Bool) -> Void {
+        clientCertRequired = clientCertificateRequired
     }
     
     func start() -> UDPServer {
+        listener.newConnectionHandler = { (newConnection) in
+            self.log("incoming")
+            newConnection.stateUpdateHandler = { newState in
+                switch newState {
+                case .ready:
+                    self.log("connection ready")
+                    self.receive(newConnection)
+                case .waiting(let error):
+                    self.log("connection waiting (\(error))")
+                case .failed(let error):
+                    self.log("connection failed (\(error))")
+                default:
+                    self.log("connection \(newState)")
+                    break
+                }
+            }
+            newConnection.start(queue: DispatchQueue(label: "receiverQueue"))
+        }
+        log("start listener...")
+        listener.start(queue: DispatchQueue(label: "listenerQueue"))
         return self
     }
     
@@ -32,28 +69,53 @@ class UDPServer {
         
     }
     
-    func send(_ message: Data) {
-        
+    private func receive(_ connection: NWConnection) {
+        self.connection = connection
+        log(connection.endpoint.debugDescription)
+//        oplConnection = NWConnection(to: connection.endpoint, using: .udp)
+//        oplConnection!.start(queue: DispatchQueue(label: "connectionQueue"))
+        connection.receiveMessage { (data, context, isComplete, error) in
+            //report an error
+            if let error = error {
+                self.log("\(error)")
+                return
+            }
+            //process received data
+            if let data = data, let message = String(data: data, encoding: .utf8)  {
+                self.log("received message: \(message)")
+                self.udpReceiver(data)
+            }
+            //restart receiving
+            self.receive(connection)
+        }
     }
     
+    func send(_ message: Data) {
+        //connection.send(
+    }
 }
 
 class UDPClient {
     
-    var connection: NWConnection
+    private let log: (_  log: String) -> Void
+    private let host: String
+    private let port: UInt16
+    private let udpReceiver: (_ receive: String) -> Void
+    
+    private let connection: NWConnection
     var connected: Bool = false
+    private var buffer: Data = Data()
+    private var expected: UInt32 = 0
     
-    var OplReceiver: (_ receive: String) -> Void
-    
-    var buffer: Data = Data()
-    var expected: UInt32 = 0
-    
-    init(host: String, port: UInt16, oplReceiver: @escaping (_ receive: String) -> Void)
+    init(_ log: @escaping (_  log: String) -> Void, host: String, port: UInt16, udpReceiver: @escaping (_ receive: String) -> Void)
     {
+        self.log = log
+        self.host = host
+        self.port = port
+        self.udpReceiver = udpReceiver
+        
         connection = NWConnection(host: "172.20.10.5", port: 10001, using: .udp)
-        
-        OplReceiver = oplReceiver
-        
+
         connection.stateUpdateHandler = { (newState) in
             switch(newState) {
             case .ready:
@@ -83,8 +145,11 @@ class UDPClient {
         connection.start(queue: .main)
     }
     
+    func withTLS() {
+        
+    }
     
-    func receiver(on connection: NWConnection) {
+    private func receiver(on connection: NWConnection) {
         connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { (data, contentContext, isComplete, error) in
             if var data = data, !data.isEmpty {
                 // … process the data …
@@ -100,7 +165,7 @@ class UDPClient {
                 print("have \(self.buffer.count) expected \(self.expected)")
                 if (self.buffer.count == self.expected) {
                     let s = String(data: self.buffer, encoding: .utf8)
-                    self.OplReceiver(s!)
+                    self.udpReceiver(s!)
                     self.buffer = Data()
                     self.expected = 0
                 }
@@ -122,11 +187,9 @@ class UDPClient {
         print("status \(status)")
     }
     
-    func connectionFailed(error: NWError?) {
+    private func connectionFailed(error: NWError?) {
         print("error \(String(describing: error))")
     }
-    
-    
     
     func send(_ data: Data) {
         print("send")
@@ -153,96 +216,4 @@ class UDPClient {
         }))
     }
     
-}
-
-
-
-
-//
-//  OPL.swift
-//
-//  Created by Rand Dow on 5/1/19.
-//  Copyright © 2019 Rand Dow. All rights reserved.
-//
-
-import Foundation
-import Network
-
-
-class OPLClient {
-    
-    var oplListener: NWListener
-    var oplConnection: NWConnection?
-    
-    var OplReceiver: (_ receive: Data) -> Void
-    
-    var Log: (_ msg: String) -> Void
-    
-    init(_ log: @escaping (_ log: String) -> Void, port: UInt16, oplReceiver: @escaping (_ receive: Data) -> Void) {
-        
-        Log = log
-        OplReceiver = oplReceiver
-        
-        let p = NWParameters.udp
-        oplConnection = NWConnection(host: NWEndpoint.Host("0.0.0.0"), port: NWEndpoint.Port(rawValue: port)!, using: p)
-        
-        p.allowLocalEndpointReuse = true
-        oplListener = try! NWListener(using: p, on: NWEndpoint.Port(rawValue: port)!)
-        
-        //p.requiredLocalEndpoint = NWEndpoint.hostPort(host: "0.0.0.0", port: NWEndpoint.Port(rawValue: port)!)
-        //oplListener = try! NWListener(using: p)
-        
-        oplListener.newConnectionHandler = { (newConnection) in
-            print("incoming")
-            
-            newConnection.stateUpdateHandler = { newState in
-                switch newState {
-                case .ready:
-                    print ("connection ready")
-                    self.receive(from: newConnection)
-                case .waiting(let error):
-                    print ("connection waiting (\(error))")
-                case .failed(let error):
-                    print ("connection failed (\(error))")
-                default:
-                    print ("connection \(newState)")
-                    break
-                }
-            }
-            
-            newConnection.start(queue: DispatchQueue(label: "receiverQueue"))
-        }
-        
-        print("start listener...")
-        oplListener.start(queue: DispatchQueue(label: "listenerQueue"))
-    }
-    
-    func receive(from connection: NWConnection) {
-        
-        print(connection.endpoint.debugDescription)
-        oplConnection = NWConnection(to: connection.endpoint, using: .udp)
-        oplConnection!.start(queue: DispatchQueue(label: "connectionQueue"))
-        
-        connection.receiveMessage { (data, context, isComplete, error) in
-            //report an error
-            if let error = error {
-                print(error)
-                return
-            }
-            
-            //process received data
-            if let data = data, let message = String(data: data, encoding: .utf8)  {
-                print("received message: \(message)")
-                self.OplReceiver( data)
-            }
-            
-            //restart receiving
-            self.receive(from: connection)
-        }
-    }
-    
-    func send() {
-        //let data = Data()
-        //oplConnection!.send(content: data, completion: <#NWConnection.SendCompletion#>)
-    }
 }
