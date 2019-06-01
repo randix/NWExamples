@@ -9,26 +9,26 @@ import Foundation
 import Network
 
 // helper functions
-func convert(_ from: MTSMessage) throws -> Data {
+func MTSconvert(_ from: MTSMessage) throws -> Data {
     return try! JSONEncoder().encode(from)
 }
 
-func convert(_ from: Data) throws -> MTSMessage {
+func MTSconvert(_ from: Data) throws -> MTSMessage {
     return try! JSONDecoder().decode(MTSMessage.self, from: from)
 }
 
 // primary message structure
 struct MTSMessage: Codable {
-    var Route: Int
-    var JWT: String
-    var Data: Data
-    var Reply: Bool
+    var route: Int
+    var jwt: String
+    var data: Data
+    var reply: Bool
     
     init(route: MTSRequest, jwt: String, data: Data, reply: Bool = false) {
-        Route = route.rawValue
-        JWT = jwt
-        Data = data
-        Reply = reply
+        self.route = route.rawValue
+        self.jwt = jwt
+        self.data = data
+        self.reply = reply
     }
 }
 
@@ -39,34 +39,72 @@ class MTSServer {
     private let mtsAccept: (_ client: MTSClient) -> Void
     private let mtsReceive: (_ from: MTSClient, _ message: MTSMessage) -> Void
     
+    private var useTLS = false
     private var certificate: Data?
     private var clientCertRequired = false
+    
+    private var listener: NWListener?
+    private var clients: [MTSClient]
     
     init(log: @escaping (_ log: String) -> Void, port: UInt16, mtsAccept: @escaping (_ client: MTSClient) -> Void, mtsReceive: @escaping (_ from: MTSClient, _ receive: MTSMessage) -> Void) {
         self.log = log
         self.port = port
         self.mtsAccept = mtsAccept
         self.mtsReceive = mtsReceive
-        
-        
-        
-        
+        clients = []
     }
     
     @discardableResult
     func withTLS(certificate: Data, clientCertificateRequired: Bool) -> MTSServer {
+        useTLS = true
         self.certificate = certificate
         clientCertRequired = clientCertificateRequired
         return self
     }
     
-    func clientCertificateRequired(_ clientCertificateRequired: Bool) -> Void {
+    func clientCertificateRequired(_ clientCertificateRequired: Bool) {
         clientCertRequired = clientCertificateRequired
     }
     
     @discardableResult
     func start() -> MTSServer {
+        var p: NWParameters
+        if useTLS {
+            p = createTLSParameters(allowInsecure: true, queue: .main)
+        } else {
+            p = NWParameters.tcp
+        }
+        p.allowLocalEndpointReuse = true
         
+        listener = try! NWListener(using: p, on: NWEndpoint.Port(rawValue: port)!)
+        listener!.stateUpdateHandler = { (newState) in
+            switch newState {
+            case .cancelled:
+                self.log("cancelled")
+                break
+            case .failed(let error):
+                self.log("failed \(error)")
+                break
+            case .ready:
+                self.log("ready")
+                break
+            case .setup:
+                self.log("setup")
+                break
+            case .waiting(let error):
+                self.log("waiting \(error)")
+                break
+            default:
+                self.log("unknown \(newState)")
+                break
+            }
+        }
+        listener!.newConnectionHandler = { (newConnection) in
+            // Handle inbound connections
+            // create MTSClient out of it
+            // mtsAccept(mtsClient)
+            newConnection.start(queue: .main)
+        }
         return self
     }
     
@@ -74,10 +112,34 @@ class MTSServer {
         
     }
     
+    func clientDisconnect(_ client: MTSClient) {
+        
+    }
+    
     func send(_ message: MTSMessage, to: MTSClient) -> Void {
         
     }
     
+    func createTLSParameters(allowInsecure: Bool, queue: DispatchQueue) -> NWParameters {
+        let options = NWProtocolTLS.Options()
+        sec_protocol_options_set_verify_block(options.securityProtocolOptions, { (sec_protocol_metadata, sec_trust, sec_protocol_verify_complete) in
+            let trust = sec_trust_copy_ref(sec_trust).takeRetainedValue()
+            var error: CFError?
+            if SecTrustEvaluateWithError(trust, &error) {
+                sec_protocol_verify_complete(true)
+            } else {
+                // TODO: determine if client cert is required and present
+                // self.clientCertRequired
+                
+                if allowInsecure == true {
+                    sec_protocol_verify_complete(true)
+                } else {
+                    sec_protocol_verify_complete(false)
+                }
+            }
+        }, queue)
+        return NWParameters(tls: options)
+    }
 }
 
 class MTSClient {
@@ -106,18 +168,15 @@ class MTSClient {
     private var buffer = Data()
     private var expected = 0
     
-    init(log: @escaping (_ log: String) -> Void,
-         url: String,
-         mtsConnect: @escaping () -> Void,
-         mtsReceive: @escaping (_ receive: MTSMessage) -> Void,
-         mtsDisconnect: @escaping () -> Void) {
+    init(log: @escaping (_ log: String) -> Void, url: String, mtsConnect: @escaping () -> Void,
+         mtsReceive: @escaping (_ receive: MTSMessage) -> Void, mtsDisconnect: @escaping () -> Void) {
         self.log = log
         self.url = URL(string: url)!
         self.mtsConnect = mtsConnect
         self.mtsReceive = mtsReceive
         self.mtsDisconnect = mtsDisconnect
     }
-
+    
     @discardableResult
     func withTLS(_ certificate: Data?) -> MTSClient {
         useTLS = true
@@ -179,23 +238,7 @@ class MTSClient {
         }
     }
     
-    func createTLSParameters(allowInsecure: Bool, queue: DispatchQueue) -> NWParameters {
-        let options = NWProtocolTLS.Options()
-        sec_protocol_options_set_verify_block(options.securityProtocolOptions, { (sec_protocol_metadata, sec_trust, sec_protocol_verify_complete) in
-            let trust = sec_trust_copy_ref(sec_trust).takeRetainedValue()
-            var error: CFError?
-            if SecTrustEvaluateWithError(trust, &error) {
-                sec_protocol_verify_complete(true)
-            } else {
-                if allowInsecure == true {
-                    sec_protocol_verify_complete(true)
-                } else {
-                    sec_protocol_verify_complete(false)
-                }
-            }
-        }, queue)
-        return NWParameters(tls: options)
-    }
+    
     
     func setupReceive(on connection: NWConnection?) {
         connection!.receive(minimumIncompleteLength: 1, maximumLength: 65536) { (data, contentContext, isComplete, error) in
@@ -215,8 +258,8 @@ class MTSClient {
                 if (self.buffer.count == self.expected) {
                     let jsonDecoder = JSONDecoder()
                     let mtsMessage = try! jsonDecoder.decode(MTSMessage.self, from: self.buffer)
-             
-                    if (self.waiting && mtsMessage.Reply) {
+                    
+                    if (self.waiting && mtsMessage.reply) {
                         self.waitReceiver(mtsMessage)
                     } else {
                         self.mtsReceive(mtsMessage)
@@ -267,7 +310,7 @@ class MTSClient {
     }
     
     func send(_ msg: MTSMessage) {
-        let data = try! MTS.convert(msg)
+        let data = try! MTSconvert(msg)
         send(data)
     }
     
@@ -280,27 +323,27 @@ class MTSClient {
     }
     func waitReceiver(_ mtsMessage: MTSMessage) {
         log("mtsMessage \(mtsMessage)")
-        print(mtsMessage.Route)
+        print(mtsMessage.route)
         let decoder = JSONDecoder()
         
-        switch MTSRequest(rawValue: mtsMessage.Route)! {
+        switch MTSRequest(rawValue: mtsMessage.route)! {
             
         case .LoginResponse:
-            obj = try! decoder.decode(MtsLoginResponse.self, from: mtsMessage.Data) as AnyObject
+            obj = try! decoder.decode(MtsLoginResponse.self, from: mtsMessage.data) as AnyObject
             break
             
         case .PPCommunicationKeys:
-            obj = try! decoder.decode(PPCommunicationKeys.self, from: mtsMessage.Data) as AnyObject
+            obj = try! decoder.decode(PPCommunicationKeys.self, from: mtsMessage.data) as AnyObject
             break;
             
         case .RoomsMap:
-            obj = try! decoder.decode(RoomToNodeIds.self, from: mtsMessage.Data) as AnyObject
+            obj = try! decoder.decode(RoomToNodeIds.self, from: mtsMessage.data) as AnyObject
             break;
             
         case .OplCommands:
-            obj = try! decoder.decode(OPLCommands.self, from: mtsMessage.Data) as AnyObject
+            obj = try! decoder.decode(OPLCommands.self, from: mtsMessage.data) as AnyObject
             break
-
+            
         default:
             break
         }
@@ -315,5 +358,23 @@ class MTSClient {
                 self.connectionFailed(error: error)
             }
         }))
+    }
+    
+    func createTLSParameters(allowInsecure: Bool, queue: DispatchQueue) -> NWParameters {
+        let options = NWProtocolTLS.Options()
+        sec_protocol_options_set_verify_block(options.securityProtocolOptions, { (sec_protocol_metadata, sec_trust, sec_protocol_verify_complete) in
+            let trust = sec_trust_copy_ref(sec_trust).takeRetainedValue()
+            var error: CFError?
+            if SecTrustEvaluateWithError(trust, &error) {
+                sec_protocol_verify_complete(true)
+            } else {
+                if allowInsecure == true {
+                    sec_protocol_verify_complete(true)
+                } else {
+                    sec_protocol_verify_complete(false)
+                }
+            }
+        }, queue)
+        return NWParameters(tls: options)
     }
 }

@@ -2,9 +2,9 @@
 
 ## Introduction
 
-There is currently a dearth of examples for Apple's Network Framework libraries. And the Apple documentation is at the level of "expert" documentation. 
+There has been a dearth of examples for Apple's Network Framework libraries. The Apple documentation is at the level of "expert" documentation. 
 
-A version of this was written in C#, contact the author if that might be useful.
+A version of this was originally written in C#, contact the author if that might be useful.
 This version in Swift is designed to run on iOS and macOS. 
 
 The purpose was to a very lightweight RPC system. This works very similar to a WebSocket, only it starts as a clean transport system, whereas a WebSocket could be considered as an enhancement to an HTTP/HTTPS server. This eliminates all of the overhead of the HTTP/HTTPS server.
@@ -62,7 +62,7 @@ func withTLS(_ certificate: Data?) -> MTSClient
 
 func withProxy(_ proxyURL: String, proxyUser: String?, proxyPassword: String?) -> MTSClient
 
-func connect() -> MTSClient
+func start() -> MTSClient
 
 func stop() -> Void
 
@@ -76,7 +76,7 @@ This supports only one client per port, and does not support UDP proxies.
 <pre>
 class UDPServer
 
-init(_ log: (_ log: String) -> Void, port: UInt16, udpReceiver: (_ from: UDPClient, _ receive: Data) -> Void)
+init(_ log: (_ log: String) -> Void, port: UInt16, udpReceive: (_ from: UDPClient, _ receive: Data) -> Void)
 
 func withTLS(certificate: Data, clientCertificateRequired: Bool = false) -> UDPServer
 
@@ -95,9 +95,11 @@ func send(_ message: Data)
 <pre>
 class UDPClient
 
-init(_ log: (_ log: String) -> Void, url: String, udpReceiver: (_ receive: Data) -> Void)
+init(_ log: (_ log: String) -> Void, url: String, udpReceive: (_ receive: Data) -> Void)
 
-func start() -> UDPServer
+func withTLS(_ certificate: Data?) -> UDPClient
+
+func start() -> UDPClient
 
 func stop() -> Void
 

@@ -122,7 +122,7 @@ class ViewController: UIViewController {
         /// RMSCommunicationKeys = 6   <-
         // RoomsMap             = 7   <->
         // OplCommands          = 8   <->
-        switch MTSRequest(rawValue: mtsMessage.Route)! {
+        switch MTSRequest(rawValue: mtsMessage.route)! {
         case .OPL:
             // keep track of Routing here - forward or process the messages
             // PP -- probably not get here (coming from BT)
@@ -132,8 +132,8 @@ class ViewController: UIViewController {
             break
             
         case .LoginResponse:
-            jwt = mtsMessage.JWT
-            let lr = try! decoder.decode(MtsLoginResponse.self, from: mtsMessage.Data)
+            jwt = mtsMessage.jwt
+            let lr = try! decoder.decode(MtsLoginResponse.self, from: mtsMessage.data)
             loginResponse = lr
             if !loginWithCertDone && loginResponse!.ClientCertificate != nil {
                 // TODO -- PP
@@ -159,7 +159,7 @@ class ViewController: UIViewController {
             break
             
         case .RoomsMap:
-            let roomToNodeIdsResponse = try! decoder.decode([RoomToNodeIds].self, from: mtsMessage.Data)
+            let roomToNodeIdsResponse = try! decoder.decode([RoomToNodeIds].self, from: mtsMessage.data)
             if (useTls) {
                 // TODO -- PP
                 roomMap = roomToNodeIdsResponse
@@ -183,7 +183,7 @@ class ViewController: UIViewController {
             break
             
         default:
-            Log("Unknown Route: \(mtsMessage.Route)")
+            Log("Unknown Route: \(mtsMessage.route)")
             break
         }
     }
