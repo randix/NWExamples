@@ -80,7 +80,7 @@ class ViewController: UIViewController {
         client!.connect()
     }
     
-    func mtsConnect()
+    func mtsConnect(_ client: MTSClient)
     {
         var mtsMessage: MTSMessage
         if (useTls) {
@@ -100,17 +100,17 @@ class ViewController: UIViewController {
             let data = try! MTSHandler.MTSConvert(Room(tfRoomId!.text!))
             mtsMessage = MTSMessage(route: MTSRequest.RoomsMap, jwt: "jwt", data: data)
         }
-        client!.send(mtsMessage)
+        self.client!.send(mtsMessage)
         displayConnected()
     }
     
-    func mtsDisconnect() {
+    func mtsDisconnect(_ client: MTSClient) {
         Log("Disconnected")
     }
     
     // This is the main driver of the RoomNode app
     // The PP will have a UI
-    func mtsReceive(_ mtsMessage: MTSMessage) {
+    func mtsReceive(_ client: MTSClient, _ mtsMessage: MTSMessage) {
         Log("mtsMessage \(mtsMessage)")
         let decoder = JSONDecoder()
         
@@ -137,17 +137,17 @@ class ViewController: UIViewController {
             loginResponse = lr
             if !loginWithCertDone && loginResponse!.ClientCertificate != nil {
                 // TODO -- PP
-                client!.Stop("have cert")
+                self.client!.Stop("have cert")
                 // 2: new client
-                client = MTSClient(log: Log, url: tfURL!.text!, mtsConnect: mtsConnect, mtsReceive: mtsReceive, mtsDisconnect: mtsDisconnect)
+                self.client = MTSClient(log: Log, url: tfURL!.text!, mtsConnect: mtsConnect, mtsReceive: mtsReceive, mtsDisconnect: mtsDisconnect)
                     .withTLS(loginResponse!.ClientCertificate)
-                client!.connect()
+                self.client!.connect()
                 return
             }
             if roomMap == nil {
                 // get room map
                 let mtsMessage = MTSMessage(route: MTSRequest.RoomsMap, jwt: "jwt", data: Data())
-                client!.send(mtsMessage)
+                self.client!.send(mtsMessage)
                 return
             }
             break

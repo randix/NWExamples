@@ -15,7 +15,7 @@ There are client and server classes for TCP and UDP examples of using the Networ
 
 ## APIs
 
-### MTSMessage
+### MTS Message
 
 <pre>
 enum MTSRequest {
@@ -31,13 +31,12 @@ class MTSMessage {
 }
 </pre>
 
-### TCP Server
+### class TCPServer
 
 This supports multiple incoming clients. 
 
+#### Methods
 <pre>
-class MTSServer
-
 init(log: (_ log: String) -> Void, port: UInt16,  mtsAccept: (_ from: MTSClient) -> Void, mtsReceive: (_ from: MTSClient, receive: MTSMessage) -> Void)
 
 func withTLS(certificate: Data, clientCertificateRequired: Bool = false) -> MTSServer
@@ -51,11 +50,15 @@ func stop() -> Void
 func send(_ message: MTSMessage, to: MTSClient)
 </pre>
 
-### TCP Client
-
+#### Properties
 <pre>
-class MTSClient
+clients: [MTSClient]
+</pre>
 
+### class TCPClient
+
+#### Methods
+<pre>
 init(_ log: (_ log: String) -> Void, url: String, mtsConnect: () -> Void, mtsReceive: (_ receive: MTSMessage) -> Void, mtsDisconnect: () -> Void) 
 
 func withTLS(_ certificate: Data?) -> MTSClient
@@ -69,13 +72,18 @@ func stop() -> Void
 func send(_ message: MTSMessage)
 </pre>
 
-### UDP Server
+#### Properties
+<pre>
+remoteEndpoint: NWEndpoint
+</pre>
+
+
+### class UDPServer
 
 This supports only one client per port, and does not support UDP proxies.
 
+#### Methods
 <pre>
-class UDPServer
-
 init(_ log: (_ log: String) -> Void, port: UInt16, udpReceive: (_ from: UDPClient, _ receive: Data) -> Void)
 
 func withTLS(certificate: Data, clientCertificateRequired: Bool = false) -> UDPServer
@@ -87,14 +95,17 @@ func start() -> UDPServer
 func stop() -> Void
 
 func send(_ message: Data)
-  
 </pre>
 
-### UDP Client
-
+#### Properties
 <pre>
-class UDPClient
+remoteEndpoint: NWEndpoint
+</pre>
 
+### class UDPClient
+
+#### Methods
+<pre>
 init(_ log: (_ log: String) -> Void, url: String, udpReceive: (_ receive: Data) -> Void)
 
 func withTLS(_ certificate: Data?) -> UDPClient
@@ -106,3 +117,7 @@ func stop() -> Void
 func send(_ message: Data)
 </pre>
 
+#### Properties
+<pre>
+remoteEndpoint: NWEndpoint
+</pre>

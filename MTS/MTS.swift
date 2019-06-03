@@ -36,8 +36,9 @@ class MTSServer {
     
     private let log: (_ log: String) -> Void
     private let port: UInt16
-    private let mtsAccept: (_ client: MTSClient) -> Void
+    private let mtsConnect: (_ client: MTSClient) -> Void
     private let mtsReceive: (_ from: MTSClient, _ message: MTSMessage) -> Void
+    private let mtsDisconnect: (_ client: MTSClient) -> Void
     
     private var useTLS = false
     private var certificate: Data?
@@ -46,11 +47,15 @@ class MTSServer {
     private var listener: NWListener?
     private var clients: [MTSClient]
     
-    init(log: @escaping (_ log: String) -> Void, port: UInt16, mtsAccept: @escaping (_ client: MTSClient) -> Void, mtsReceive: @escaping (_ from: MTSClient, _ receive: MTSMessage) -> Void) {
+    init(log: @escaping (_ log: String) -> Void, port: UInt16,
+         mtsConnect: @escaping (_ client: MTSClient) -> Void,
+         mtsReceive: @escaping (_ from: MTSClient, _ receive: MTSMessage) -> Void,
+         mtsDisconnect: @escaping (_ from: MTSClient) -> Void) {
         self.log = log
         self.port = port
-        self.mtsAccept = mtsAccept
+        self.mtsConnect = mtsConnect
         self.mtsReceive = mtsReceive
+        self.mtsDisconnect = mtsDisconnect
         clients = []
     }
     
@@ -101,8 +106,8 @@ class MTSServer {
         }
         listener!.newConnectionHandler = { (newConnection) in
             // Handle inbound connections
-            // create MTSClient out of it
-            // mtsAccept(mtsClient)
+            let client = MTSClient(log: self.log, url: newConnection.endpoint.debugDescription, mtsConnect: self.mtsConnect, mtsReceive: self.mtsReceive, mtsDisconnect: self.mtsDisconnectServer, connection: newConnection)
+            // mtsConnect(mtsClient)
             newConnection.start(queue: .main)
         }
         return self
@@ -112,7 +117,9 @@ class MTSServer {
         
     }
     
-    func clientDisconnect(_ client: MTSClient) {
+    func mtsDisconnectServer(_ client: MTSClient) {
+        // clean up, then
+        mtsDisconnect(client)
         
     }
     
@@ -146,9 +153,10 @@ class MTSClient {
     
     private let log: (_ log: String) -> Void
     private let url: URL
-    private let mtsConnect: () -> Void
-    private let mtsReceive: (_ receive: MTSMessage) -> Void
-    private let mtsDisconnect: () -> Void
+    private let mtsConnect: (_ client: MTSClient) -> Void
+    private let mtsReceive: (_ client: MTSClient, _ receive: MTSMessage) -> Void
+    private let mtsDisconnect: (_ client: MTSClient) -> Void
+    private let isServer = false
     
     private var connection: NWConnection?
     var connected = false
@@ -168,13 +176,17 @@ class MTSClient {
     private var buffer = Data()
     private var expected = 0
     
-    init(log: @escaping (_ log: String) -> Void, url: String, mtsConnect: @escaping () -> Void,
-         mtsReceive: @escaping (_ receive: MTSMessage) -> Void, mtsDisconnect: @escaping () -> Void) {
+    init(log: @escaping (_ log: String) -> Void, url: String,
+         mtsConnect: @escaping (_ client: MTSClient) -> Void,
+         mtsReceive: @escaping (_ client: MTSClient, _ receive: MTSMessage) -> Void,
+         mtsDisconnect: @escaping (_ client: MTSClient) -> Void,
+         connection: NWConnection? = nil) {
         self.log = log
         self.url = URL(string: url)!
         self.mtsConnect = mtsConnect
         self.mtsReceive = mtsReceive
         self.mtsDisconnect = mtsDisconnect
+        self.connection = connection
     }
     
     @discardableResult
@@ -198,15 +210,20 @@ class MTSClient {
     func connect() -> MTSClient {
         log("connect to \(url.host!):\(url.port!) (TLS=\(useTLS))")
         // TODO client cert not implemented
-        // TODO proxy not implemented
-        let myHost = NWEndpoint.Host(url.host!)
-        let myPort =  NWEndpoint.Port(rawValue: UInt16(url.port!))!
-        if useTLS {
-            connection = NWConnection(host: myHost, port: myPort, using: createTLSParameters(allowInsecure: true, queue: .main))
+        if connection != nil {
+            // this was called from the server upon connection
+            
         } else {
-            connection = NWConnection(host: myHost, port: myPort, using: .tcp)
+            // TODO proxy not implemented
+            let myHost = NWEndpoint.Host(url.host!)
+            let myPort =  NWEndpoint.Port(rawValue: UInt16(url.port!))!
+            if useTLS {
+                connection = NWConnection(host: myHost, port: myPort, using: createTLSParameters(allowInsecure: true, queue: .main))
+            } else {
+                connection = NWConnection(host: myHost, port: myPort, using: .tcp)
+            }
         }
-        connection!.stateUpdateHandler = stateDidChange(to:)
+        connection!.stateUpdateHandler = stateDidChange
         setupReceive(on: connection)
         connection!.start(queue: .main)
         return self
@@ -218,7 +235,7 @@ class MTSClient {
             // Handle connection established
             log("connected")
             self.connected = true
-            mtsConnect()
+            mtsConnect(self)
             break
         case .waiting(let error):
             // Handle connection waiting for network
@@ -262,7 +279,7 @@ class MTSClient {
                     if (self.waiting && mtsMessage.reply) {
                         self.waitReceiver(mtsMessage)
                     } else {
-                        self.mtsReceive(mtsMessage)
+                        self.mtsReceive(self, mtsMessage)
                     }
                     self.buffer = Data()
                     self.expected = 0
