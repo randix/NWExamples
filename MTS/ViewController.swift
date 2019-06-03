@@ -137,7 +137,7 @@ class ViewController: UIViewController {
             loginResponse = lr
             if !loginWithCertDone && loginResponse!.ClientCertificate != nil {
                 // TODO -- PP
-                self.client!.Stop("have cert")
+                self.client!.stop("have cert")
                 // 2: new client
                 self.client = MTSClient(log: Log, url: tfURL!.text!, mtsConnect: mtsConnect, mtsReceive: mtsReceive, mtsDisconnect: mtsDisconnect)
                     .withTLS(loginResponse!.ClientCertificate)
@@ -194,7 +194,7 @@ class ViewController: UIViewController {
   
     @objc func buttonDisconnect(sender: UIButton!) {
         displayConnect()
-        client?.Stop("shutting down")
+        client?.stop("shutting down")
         Log("disconnected")
     }
     

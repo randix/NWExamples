@@ -35,7 +35,7 @@ struct MTSMessage: Codable {
 class MTSServer {
     
     private let log: (_ log: String) -> Void
-    private let port: UInt16
+    public let port: UInt16
     private let mtsConnect: (_ client: MTSClient) -> Void
     private let mtsReceive: (_ from: MTSClient, _ message: MTSMessage) -> Void
     private let mtsDisconnect: (_ client: MTSClient) -> Void
@@ -45,7 +45,7 @@ class MTSServer {
     private var clientCertRequired = false
     
     private var listener: NWListener?
-    private var clients: [MTSClient]
+    public private(set) var clients: [MTSClient]
     
     init(log: @escaping (_ log: String) -> Void, port: UInt16,
          mtsConnect: @escaping (_ client: MTSClient) -> Void,
@@ -107,8 +107,7 @@ class MTSServer {
         listener!.newConnectionHandler = { (newConnection) in
             // Handle inbound connections
             let client = MTSClient(log: self.log, url: newConnection.endpoint.debugDescription, mtsConnect: self.mtsConnect, mtsReceive: self.mtsReceive, mtsDisconnect: self.mtsDisconnectServer, connection: newConnection)
-            // mtsConnect(mtsClient)
-            newConnection.start(queue: .main)
+            client.connect()
         }
         return self
     }
@@ -118,9 +117,8 @@ class MTSServer {
     }
     
     func mtsDisconnectServer(_ client: MTSClient) {
-        // clean up, then
+        // TODO clean up, then
         mtsDisconnect(client)
-        
     }
     
     func send(_ message: MTSMessage, to: MTSClient) -> Void {
@@ -152,14 +150,14 @@ class MTSServer {
 class MTSClient {
     
     private let log: (_ log: String) -> Void
-    private let url: URL
+    public let url: URL
     private let mtsConnect: (_ client: MTSClient) -> Void
     private let mtsReceive: (_ client: MTSClient, _ receive: MTSMessage) -> Void
     private let mtsDisconnect: (_ client: MTSClient) -> Void
     private let isServer = false
     
     private var connection: NWConnection?
-    var connected = false
+    public private(set) var connected = false
     
     private var useTLS = false
     private var clientCertificate: Data?
@@ -226,6 +224,7 @@ class MTSClient {
         connection!.stateUpdateHandler = stateDidChange
         setupReceive(on: connection)
         connection!.start(queue: .main)
+        mtsConnect(self)
         return self
     }
     
@@ -254,8 +253,6 @@ class MTSClient {
             break
         }
     }
-    
-    
     
     func setupReceive(on connection: NWConnection?) {
         connection!.receive(minimumIncompleteLength: 1, maximumLength: 65536) { (data, contentContext, isComplete, error) in
@@ -287,11 +284,15 @@ class MTSClient {
             }
             if isComplete {
                 // … handle end of stream …
-                self.Stop("EOF")
+                self.stop("EOF")
+                // todo -- tell server if we are on server
+                // todo -- tell application
             } else if let error = error {
                 // … handle error …
                 print("error")
                 self.connectionFailed(error: error)
+                // todo -- tell server if we are on server
+                // todo -- tell application
             } else {
                 print("restart receiver")
                 self.setupReceive(on: connection)
@@ -299,7 +300,7 @@ class MTSClient {
         }
     }
     
-    func Stop(_ status: String) {
+    func stop(_ status: String) {
         print("stopping \(status)")
         sendEndOfStream()
     }

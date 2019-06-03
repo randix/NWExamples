@@ -52,6 +52,8 @@ func send(_ message: MTSMessage, to: MTSClient)
 
 #### Properties
 <pre>
+port: UInt16
+
 clients: [MTSClient]
 </pre>
 
