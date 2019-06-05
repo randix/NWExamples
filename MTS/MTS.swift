@@ -150,7 +150,8 @@ class MTSServer {
 class MTSClient {
     
     private let log: (_ log: String) -> Void
-    public let url: URL
+    public let host: String
+    public let port: UInt16
     private let mtsConnect: (_ client: MTSClient) -> Void
     private let mtsReceive: (_ client: MTSClient, _ receive: MTSMessage) -> Void
     private let mtsDisconnect: (_ client: MTSClient) -> Void
@@ -180,7 +181,9 @@ class MTSClient {
          mtsDisconnect: @escaping (_ client: MTSClient) -> Void,
          connection: NWConnection? = nil) {
         self.log = log
-        self.url = URL(string: url)!
+        let result = url.split(separator: ":")
+        self.host = String(result[0])
+        self.port = UInt16(String(result[1]))!
         self.mtsConnect = mtsConnect
         self.mtsReceive = mtsReceive
         self.mtsDisconnect = mtsDisconnect
@@ -206,15 +209,15 @@ class MTSClient {
     
     @discardableResult
     func connect() -> MTSClient {
-        log("connect to \(url.host!):\(url.port!) (TLS=\(useTLS))")
+        //log("connect to \(url.host!):\(url.port!) (TLS=\(useTLS))")
         // TODO client cert not implemented
         if connection != nil {
             // this was called from the server upon connection
             
         } else {
             // TODO proxy not implemented
-            let myHost = NWEndpoint.Host(url.host!)
-            let myPort =  NWEndpoint.Port(rawValue: UInt16(url.port!))!
+            let myHost = NWEndpoint.Host(host)
+            let myPort =  NWEndpoint.Port(rawValue: UInt16(port))!
             if useTLS {
                 connection = NWConnection(host: myHost, port: myPort, using: createTLSParameters(allowInsecure: true, queue: .main))
             } else {
