@@ -346,8 +346,17 @@ class MTSClient {
     func sendWait(_ data: MTSMessage) -> AnyObject {
         print("sendwait")
         waiting = true
-        send(data);
-        await.wait()
+        
+        DispatchQueue.global(qos: .background).async {
+            print("This is run on the background queue")
+            self.send(data);
+            self.await.wait()
+            
+            DispatchQueue.main.async {
+                print("This is run on the main queue, after the previous code in outer block")
+                
+            }
+        }
         return obj!
     }
     func waitReceiver(_ mtsMessage: MTSMessage) {

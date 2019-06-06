@@ -23,6 +23,10 @@ class ViewController: UIViewController {
     var loginWithCertDone = false
     var roomMap: [MtsRoomToNodeIds]?
     
+    var firmware = Data()
+    let fwSegmentSize = 16*1024
+    var firmwareSize = 0
+    
     // below are the UI stuff
     var screenWidth: Int?
     var screenHeight: Int?
@@ -130,6 +134,7 @@ class ViewController: UIViewController {
             
         case .MtsOPL:
             // keep track of Routing here - forward or process the messages
+            
             // PP -- probably not get here (coming from BT)
             
             // RMSRmNd -- this is the main thing here
@@ -163,9 +168,25 @@ class ViewController: UIViewController {
             
             break
             
+        case .MtsFirmware:
+            let fw = try! decoder.decode(MtsFirmware.self, from: mtsMessage.data)
+            Log("firmware: offset: \(fw.Offset)")
+            firmware.append(fw.Data)
+            firmwareSize += fw.SegmentSize
+            if (fw.IsFinal) {
+                Log("firmware size: \(firmware.count) real: \(firmwareSize)")
+                return
+            }
+            let fwReq = MtsFirmwareReq(Offset: fw.Offset + fw.SegmentSize, MaximumSegmentSize: fwSegmentSize)
+            let data = try! MTSConvert(fwReq)
+            let mtsMessage = MTSMessage(route: MTSRequest.MtsFirmware, jwt: "jwt", data: data)
+            self.client!.send(mtsMessage)
+            break
+            
         case .MtsRoomsMap:
             let json = String(data: mtsMessage.data, encoding: .utf8)!
             print("json=\(json)")
+            
             let roomToNodeIdsResponse = try! decoder.decode([MtsRoomToNodeIds].self, from: mtsMessage.data)
             print("\(roomToNodeIdsResponse)")
             if (useTls) {
@@ -175,6 +196,10 @@ class ViewController: UIViewController {
                 // TODO -- now get the keys
                 
                 // TODO -- get the firmware
+                let fwReq = MtsFirmwareReq(Offset: 0, MaximumSegmentSize: fwSegmentSize)
+                let data = try! MTSConvert(fwReq)
+                let mtsMessage = MTSMessage(route: MTSRequest.MtsFirmware, jwt: "jwt", data: data)
+                self.client!.send(mtsMessage)
                 
             } else {
                 roomToNodeIds = roomToNodeIdsResponse[0]

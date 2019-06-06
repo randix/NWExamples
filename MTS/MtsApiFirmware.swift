@@ -10,7 +10,7 @@ import Foundation
 
 struct MtsFirmwareReq : Codable {
     var Offset: Int
-    var MaximumSegmentize: Int
+    var MaximumSegmentSize: Int
 }
 
 struct MtsFirmware : Codable {
