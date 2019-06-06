@@ -1,8 +1,8 @@
 //
-//  Login.swift
+//  MtsApiLogin.swift
 //  MTS
 //
-//  Created by Rand Dow on 5/1/19.
+//  Created by Rand Dow on 6/5/19.
 //  Copyright © 2019 Rand Dow. All rights reserved.
 //
 
@@ -35,4 +35,12 @@ struct MtsLoginResponse : Codable {
     var MtuBluetooth: Int
     var MtuOpl: Int
     var MtuMts: Int
+}
+
+func MTSConvert(_ data: MtsLogin) throws -> Data {
+    return try! JSONEncoder().encode(data)
+}
+
+func MTSConvert(_ data: MtsLoginResponse) throws -> Data {
+    return try! JSONEncoder().encode(data)
 }

@@ -1,12 +1,13 @@
 //
-//  MtsKeys.swift
+//  MtsApiCommunicationKeys.swift
 //  MTS
 //
-//  Created by Rand Dow on 5/21/19.
+//  Created by Rand Dow on 6/5/19.
 //  Copyright © 2019 Rand Dow. All rights reserved.
 //
 
 import Foundation
+
 
 enum KeyType: Int {
     case KOPLRMSEvent       = 1
@@ -23,14 +24,10 @@ enum KeyType: Int {
     case KMiFareUltraLightC = 11
 }
 
-struct MtsCommunicationKeyReq : Codable {
-    var AppKey: Data
-}
-
-struct RMSCommunicationKeys : Codable {
+struct MtsCommunicationKeys : Codable {
     var Keys: Dictionary<Int, [Data]>
 }
 
-struct PPCommunicationKeys : Codable {
-    var Keys: Dictionary<Int, [Data]>
+func MTSConvert(_ data: MtsCommunicationKeys) throws -> Data {
+    return try! JSONEncoder().encode(data)
 }

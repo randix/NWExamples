@@ -39,6 +39,7 @@ class MTSServer {
     private let mtsConnect: (_ client: MTSClient) -> Void
     private let mtsReceive: (_ from: MTSClient, _ message: MTSMessage) -> Void
     private let mtsDisconnect: (_ client: MTSClient) -> Void
+    private let mtsConvert: (_ log: (_ log: String) -> Void, _ mtsMessage: MTSMessage) -> AnyObject
     
     private var useTLS = false
     private var certificate: Data?
@@ -50,12 +51,14 @@ class MTSServer {
     init(log: @escaping (_ log: String) -> Void, port: UInt16,
          mtsConnect: @escaping (_ client: MTSClient) -> Void,
          mtsReceive: @escaping (_ from: MTSClient, _ receive: MTSMessage) -> Void,
-         mtsDisconnect: @escaping (_ from: MTSClient) -> Void) {
+         mtsDisconnect: @escaping (_ from: MTSClient) -> Void,
+         mtsConvert: @escaping (_ log: (_ log: String) -> Void, _ mtsMessage: MTSMessage) -> AnyObject) {
         self.log = log
         self.port = port
         self.mtsConnect = mtsConnect
         self.mtsReceive = mtsReceive
         self.mtsDisconnect = mtsDisconnect
+        self.mtsConvert = mtsConvert
         clients = []
     }
     
@@ -106,7 +109,7 @@ class MTSServer {
         }
         listener!.newConnectionHandler = { (newConnection) in
             // Handle inbound connections
-            let client = MTSClient(log: self.log, url: newConnection.endpoint.debugDescription, mtsConnect: self.mtsConnect, mtsReceive: self.mtsReceive, mtsDisconnect: self.mtsDisconnectServer, connection: newConnection)
+            let client = MTSClient(log: self.log, url: newConnection.endpoint.debugDescription, mtsConnect: self.mtsConnect, mtsReceive: self.mtsReceive, mtsDisconnect: self.mtsDisconnectServer, mtsConvert: self.mtsConvert, connection: newConnection)
             client.connect()
         }
         return self
@@ -155,6 +158,7 @@ class MTSClient {
     private let mtsConnect: (_ client: MTSClient) -> Void
     private let mtsReceive: (_ client: MTSClient, _ receive: MTSMessage) -> Void
     private let mtsDisconnect: (_ client: MTSClient) -> Void
+    private let mtsConvert: (_ log: (_ log: String) -> Void, _ mtsMessage: MTSMessage) -> AnyObject
     private let isServer = false
     
     private var connection: NWConnection?
@@ -179,7 +183,9 @@ class MTSClient {
          mtsConnect: @escaping (_ client: MTSClient) -> Void,
          mtsReceive: @escaping (_ client: MTSClient, _ receive: MTSMessage) -> Void,
          mtsDisconnect: @escaping (_ client: MTSClient) -> Void,
+         mtsConvert: @escaping (_ log: (_ log: String) -> Void, _ mtsMessage: MTSMessage) -> AnyObject,
          connection: NWConnection? = nil) {
+        
         self.log = log
         let result = url.split(separator: ":")
         self.host = String(result[0])
@@ -187,6 +193,7 @@ class MTSClient {
         self.mtsConnect = mtsConnect
         self.mtsReceive = mtsReceive
         self.mtsDisconnect = mtsDisconnect
+        self.mtsConvert = mtsConvert
         self.connection = connection
     }
     
@@ -209,7 +216,7 @@ class MTSClient {
     
     @discardableResult
     func connect() -> MTSClient {
-        //log("connect to \(url.host!):\(url.port!) (TLS=\(useTLS))")
+        log("connect to \(host):\(port) (TLS=\(useTLS))")
         // TODO client cert not implemented
         if connection != nil {
             // this was called from the server upon connection
@@ -227,7 +234,6 @@ class MTSClient {
         connection!.stateUpdateHandler = stateDidChange
         setupReceive(on: connection)
         connection!.start(queue: .main)
-        mtsConnect(self)
         return self
     }
     
@@ -275,7 +281,7 @@ class MTSClient {
                 if (self.buffer.count == self.expected) {
                     let jsonDecoder = JSONDecoder()
                     let mtsMessage = try! jsonDecoder.decode(MTSMessage.self, from: self.buffer)
-                    
+                    print("waiting: \(self.waiting)")
                     if (self.waiting && mtsMessage.reply) {
                         self.waitReceiver(mtsMessage)
                     } else {
@@ -331,12 +337,14 @@ class MTSClient {
     }
     
     func send(_ msg: MTSMessage) {
+        log("send \(msg)")
         let data = try! MTSconvert(msg)
         send(data)
     }
     
     var obj: AnyObject?
     func sendWait(_ data: MTSMessage) -> AnyObject {
+        print("sendwait")
         waiting = true
         send(data);
         await.wait()
@@ -345,29 +353,7 @@ class MTSClient {
     func waitReceiver(_ mtsMessage: MTSMessage) {
         log("mtsMessage \(mtsMessage)")
         print(mtsMessage.route)
-        let decoder = JSONDecoder()
-        
-        switch MTSRequest(rawValue: mtsMessage.route)! {
-            
-        case .LoginResponse:
-            obj = try! decoder.decode(MtsLoginResponse.self, from: mtsMessage.data) as AnyObject
-            break
-            
-        case .PPCommunicationKeys:
-            obj = try! decoder.decode(PPCommunicationKeys.self, from: mtsMessage.data) as AnyObject
-            break;
-            
-        case .RoomsMap:
-            obj = try! decoder.decode(RoomToNodeIds.self, from: mtsMessage.data) as AnyObject
-            break;
-            
-        case .OplCommands:
-            obj = try! decoder.decode(OPLCommands.self, from: mtsMessage.data) as AnyObject
-            break
-            
-        default:
-            break
-        }
+        obj = mtsConvert(log, mtsMessage)
         waiting = false
         await.signal()
     }

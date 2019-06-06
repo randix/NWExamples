@@ -12,16 +12,16 @@ import Network
 class ViewController: UIViewController {
     
     var client: MTSClient?
-    var useTls = false
+    var useTls = true
 
     // RMSRmNd Data
-    var roomToNodeIds: RoomToNodeIds?
+    var roomToNodeIds: MtsRoomToNodeIds?
     
     // PP MTS Test data
     var loginResponse: MtsLoginResponse?
     var jwt: String?
     var loginWithCertDone = false
-    var roomMap: [RoomToNodeIds]?
+    var roomMap: [MtsRoomToNodeIds]?
     
     // below are the UI stuff
     var screenWidth: Int?
@@ -73,32 +73,35 @@ class ViewController: UIViewController {
             Log("Connecting (no TLS) ...")
         }
         
-        client = MTSClient(log: Log, url: tfURL!.text!, mtsConnect: mtsConnect, mtsReceive: mtsReceive, mtsDisconnect: mtsDisconnect)
+        client = MTSClient(log: Log, url: tfURL!.text!, mtsConnect: mtsConnect, mtsReceive: mtsReceive, mtsDisconnect: mtsDisconnect, mtsConvert: mtsConvertWait)
         if (useTls) {
             client!.withTLS(nil)
         }
         client!.connect()
     }
     
+    // called when the connection is established
     func mtsConnect(_ client: MTSClient)
     {
         var mtsMessage: MTSMessage
         if (useTls) {
-            Log("login to FrontDeskServer")
+            Log("login to FrontDeskServer as Portable Programmer")
             // connected to FrontDeskServer -- get PP type stuff
             let login = MtsLogin(user:tfUser!.text!, password:tfPwd!.text!, appId:AppId.RMSRmNd, appKey:Data())
-            let data = try! MTSHandler.MTSConvert(login)
-            mtsMessage = MTSMessage(route: MTSRequest.Login, jwt: "jwt", data: data)
+            let data = try! MTSConvert(login)
+            mtsMessage = MTSMessage(route: MTSRequest.MtsLogin, jwt: "jwt", data: data)
             if let lr = loginResponse {
                 if lr.ClientCertificate != nil {
                     loginWithCertDone = true
                 }
             }
+            //let loginResponse =  self.client!.sendWait(mtsMessage) as! MtsLoginResponse
+            
         } else {
             // connected to RMSServer -- get Room NodeIds
-            Log("get room nodeIds")
-            let data = try! MTSHandler.MTSConvert(Room(tfRoomId!.text!))
-            mtsMessage = MTSMessage(route: MTSRequest.RoomsMap, jwt: "jwt", data: data)
+            Log("connect to RMSServer and get room nodeIds")
+            let data = try! MTSConvert(MtsRoom(tfRoomId!.text!))
+            mtsMessage = MTSMessage(route: MTSRequest.MtsRoomsMap, jwt: "jwt", data: data)
         }
         self.client!.send(mtsMessage)
         displayConnected()
@@ -111,7 +114,7 @@ class ViewController: UIViewController {
     // This is the main driver of the RoomNode app
     // The PP will have a UI
     func mtsReceive(_ client: MTSClient, _ mtsMessage: MTSMessage) {
-        Log("mtsMessage \(mtsMessage)")
+        Log("receive \(mtsMessage)")
         let decoder = JSONDecoder()
         
         // OPL                  = 1   <->
@@ -119,11 +122,13 @@ class ViewController: UIViewController {
         // LoginResponse        = 3   <-
         // CommunicationKeyReq  = 4    ->
         // PPCommunicationKeys  = 5   <-
-        /// RMSCommunicationKeys = 6   <-
+        // RMSCommunicationKeys = 6   <-
         // RoomsMap             = 7   <->
         // OplCommands          = 8   <->
+        // Firmware             = 9   <->
         switch MTSRequest(rawValue: mtsMessage.route)! {
-        case .OPL:
+            
+        case .MtsOPL:
             // keep track of Routing here - forward or process the messages
             // PP -- probably not get here (coming from BT)
             
@@ -131,7 +136,7 @@ class ViewController: UIViewController {
             
             break
             
-        case .LoginResponse:
+        case .MtsLoginResponse:
             jwt = mtsMessage.jwt
             let lr = try! decoder.decode(MtsLoginResponse.self, from: mtsMessage.data)
             loginResponse = lr
@@ -139,34 +144,37 @@ class ViewController: UIViewController {
                 // TODO -- PP
                 self.client!.stop("have cert")
                 // 2: new client
-                self.client = MTSClient(log: Log, url: tfURL!.text!, mtsConnect: mtsConnect, mtsReceive: mtsReceive, mtsDisconnect: mtsDisconnect)
+                self.client = MTSClient(log: Log, url: tfURL!.text!, mtsConnect: mtsConnect, mtsReceive: mtsReceive, mtsDisconnect: mtsDisconnect, mtsConvert: mtsConvertWait)
                     .withTLS(loginResponse!.ClientCertificate)
                 self.client!.connect()
                 return
             }
             if roomMap == nil {
                 // get room map
-                let mtsMessage = MTSMessage(route: MTSRequest.RoomsMap, jwt: "jwt", data: Data())
+                let mtsMessage = MTSMessage(route: MTSRequest.MtsRoomsMap, jwt: "jwt", data: Data())
                 self.client!.send(mtsMessage)
                 return
             }
             break
             
-        case .PPCommunicationKeys:
+        case .MtsCommunicationKeys:
             //let ppCommunicationKeys = try! decoder.decode(PPCommunicationKeys.self, from: mtsMessage.Data)
             // TODO -- PP
             
             break
             
-        case .RoomsMap:
-            let roomToNodeIdsResponse = try! decoder.decode([RoomToNodeIds].self, from: mtsMessage.data)
+        case .MtsRoomsMap:
+            let json = String(data: mtsMessage.data, encoding: .utf8)!
+            print("json=\(json)")
+            let roomToNodeIdsResponse = try! decoder.decode([MtsRoomToNodeIds].self, from: mtsMessage.data)
+            print("\(roomToNodeIdsResponse)")
             if (useTls) {
                 // TODO -- PP
                 roomMap = roomToNodeIdsResponse
                 
                 // TODO -- now get the keys
                 
-                
+                // TODO -- get the firmware
                 
             } else {
                 roomToNodeIds = roomToNodeIdsResponse[0]
@@ -176,7 +184,7 @@ class ViewController: UIViewController {
             }
             break
             
-        case .OplCommands:
+        case .MtsOplCommands:
             //let oplCommands = try! decoder.decode(OPLCommands.self, from: mtsMessage.Data)
             // TODO -- PP
             
@@ -218,8 +226,8 @@ class ViewController: UIViewController {
         // connect to RMS Server
         tfURL = UITextField(frame: CGRect(x:inputOffset, y:topOffset+border, width:inputWidth, height:inputHeight))
         tfURL!.borderStyle = .roundedRect
-        tfURL!.placeholder = "127.0.0.1:10002"
-        tfURL!.text = "172.20.10.5:10002"
+        tfURL!.placeholder = "127.0.0.1:10001"
+        tfURL!.text = "172.20.10.5:10001"
         //tfURL!.text = "172.20.10.5:10002"
         tfURL!.backgroundColor = UIColor.white
         tfURL!.textColor = UIColor.blue
@@ -282,7 +290,7 @@ class ViewController: UIViewController {
         let myFrame = CGRect(x:0, y:0, width:1, height:1)
         tView = UITextView(frame: myFrame)
         tView!.backgroundColor = .lightGray
-        tView!.text = "RMSRmNd Version 0.5\n"
+        tView!.text = "RMSRmNd Version 0.6\n"
     }
     
     func displayConnect() {
