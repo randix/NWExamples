@@ -7,11 +7,23 @@ There has been a dearth of examples for Apple's Network Framework libraries. The
 A version of this was originally written in C#, contact the author if that might be useful.
 This version in Swift is designed to run on iOS and macOS. 
 
-The purpose was to a very lightweight RPC system. This works very similar to a WebSocket, only it starts as a clean transport system, whereas a WebSocket could be considered as an enhancement to an HTTP/HTTPS server. This eliminates all of the overhead of the HTTP/HTTPS server.
+The purpose was to be a lightweight RPC (remote procedure call) system. This works very similar to a WebSocket, only it starts as a clean transport system, whereas a WebSocket could be considered as an enhancement to an HTTP/HTTPS server. This eliminates all of the overhead of the HTTP/HTTPS server.
 
 ## What is here?
 
 There are client and server classes for TCP and UDP examples of using the Network Framkework. This supports TLS and working through a proxy (at the simplest level).
+
+## FAQ
+
+## Getting Started (w/Demo App)...
+
+## Use-Case Walkthroughs
+
+### Setting Up Server
+
+### Setting Up Client
+
+## Issue Troubleshooting
 
 ## APIs
 
@@ -19,15 +31,15 @@ There are client and server classes for TCP and UDP examples of using the Networ
 
 <pre>
 enum MTSRequest {
-    case RPC1         // user defined RPCs
-    case RMC2
+case RPC1         // user defined RPCs
+case RMC2
 }
-    
+
 class MTSMessage {
-    route: MTSRequest
-    jwt: String         // JSON Web Token (if desired)
-    data: Data 
-    reply: Bool = false
+route: MTSRequest
+jwt: String         // JSON Web Token (if desired)
+data: Data 
+reply: Bool = false
 }
 </pre>
 
