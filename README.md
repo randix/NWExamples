@@ -25,6 +25,7 @@ enum MTSRequest {
     
 class MTSMessage {
     route: MTSRequest
+    attributeRoute: String?
     jwt: String         // JSON Web Token (if desired)
     data: Data 
     reply: Bool = false

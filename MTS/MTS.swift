@@ -20,12 +20,14 @@ func MTSconvert(_ from: Data) throws -> MTSMessage {
 // primary message structure
 struct MTSMessage: Codable {
     var route: Int
+    var attributeRoute: String?
     var jwt: String
     var data: Data
     var reply: Bool
     
-    init(route: MTSRequest, jwt: String, data: Data, reply: Bool = false) {
+    init(route: MTSRequest, attributeRoute: String?, jwt: String, data: Data, reply: Bool = false) {
         self.route = route.rawValue
+        self.attributeRoute = attributeRoute
         self.jwt = jwt
         self.data = data
         self.reply = reply

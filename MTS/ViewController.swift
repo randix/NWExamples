@@ -93,7 +93,7 @@ class ViewController: UIViewController {
             // connected to FrontDeskServer -- get PP type stuff
             let login = MtsLogin(user:tfUser!.text!, password:tfPwd!.text!, appId:AppId.RMSRmNd, appKey:Data())
             let data = try! MTSConvert(login)
-            mtsMessage = MTSMessage(route: MTSRequest.MtsLogin, jwt: "jwt", data: data)
+            mtsMessage = MTSMessage(route: MTSRequest.MtsLogin, attributeRoute: nil, jwt: "jwt", data: data)
             if let lr = loginResponse {
                 if lr.ClientCertificate != nil {
                     loginWithCertDone = true
@@ -105,7 +105,7 @@ class ViewController: UIViewController {
             // connected to RMSServer -- get Room NodeIds
             Log("connect to RMSServer and get room nodeIds")
             let data = try! MTSConvert(MtsRoom(tfRoomId!.text!))
-            mtsMessage = MTSMessage(route: MTSRequest.MtsRoomsMap, jwt: "jwt", data: data)
+            mtsMessage = MTSMessage(route: MTSRequest.MtsRoomsMap, attributeRoute: nil, jwt: "jwt", data: data)
         }
         self.client!.send(mtsMessage)
         displayConnected()
@@ -156,7 +156,7 @@ class ViewController: UIViewController {
             }
             if roomMap == nil {
                 // get room map
-                let mtsMessage = MTSMessage(route: MTSRequest.MtsRoomsMap, jwt: "jwt", data: Data())
+                let mtsMessage = MTSMessage(route: MTSRequest.MtsRoomsMap, attributeRoute: "", jwt: "jwt", data: Data())
                 self.client!.send(mtsMessage)
                 return
             }
@@ -179,7 +179,7 @@ class ViewController: UIViewController {
             }
             let fwReq = MtsFirmwareReq(Offset: fw.Offset + fw.SegmentSize, MaximumSegmentSize: fwSegmentSize)
             let data = try! MTSConvert(fwReq)
-            let mtsMessage = MTSMessage(route: MTSRequest.MtsFirmware, jwt: "jwt", data: data)
+            let mtsMessage = MTSMessage(route: MTSRequest.MtsFirmware, attributeRoute: "", jwt: "jwt", data: data)
             self.client!.send(mtsMessage)
             break
             
@@ -198,7 +198,7 @@ class ViewController: UIViewController {
                 // TODO -- get the firmware
                 let fwReq = MtsFirmwareReq(Offset: 0, MaximumSegmentSize: fwSegmentSize)
                 let data = try! MTSConvert(fwReq)
-                let mtsMessage = MTSMessage(route: MTSRequest.MtsFirmware, jwt: "jwt", data: data)
+                let mtsMessage = MTSMessage(route: MTSRequest.MtsFirmware, attributeRoute: "", jwt: "jwt", data: data)
                 self.client!.send(mtsMessage)
                 
             } else {
