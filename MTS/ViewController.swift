@@ -46,7 +46,6 @@ class ViewController: UIViewController {
     var btDisconn: UIButton?
     var tView: UITextView?
     
-  
     // MARK: - Functions
     
     /// Do any additional setup after loading the view.
