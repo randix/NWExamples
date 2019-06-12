@@ -31,17 +31,8 @@ class ViewController: UIViewController {
     var screenWidth: Int?
     var screenHeight: Int?
     
-    let border = 5
-    let topOffset = 88
-    let bottomOffset = 20
-    
-    let inputHeight = 31    // standard height for UITextField and UIButton
-    let inputWidth = 250
-    let buttonWidth = 100
-    let chBoxWidth = 22
-    let interChk = 7
-    let tlsLabWidth = 35
-    let interButton = 20
+    // MARK: - Properties: IBOutlets
+    // TODO: - clean this up to IB's; or not worth it?
     
     var tfURL: UITextField?
     var tfUser: UITextField?
@@ -244,27 +235,40 @@ class ViewController: UIViewController {
     
     func createSubviews() {
         
-        let inputOffset = (screenWidth! - inputWidth) / 2
-        let buttonOffset = (screenWidth! - buttonWidth - interButton - buttonWidth) / 2
-        let buttonOffset2 = (screenWidth! - chBoxWidth - interButton - tlsLabWidth - interButton - buttonWidth) / 2
+        let inputOffset = (screenWidth! - VCDimension.inputWidth) / 2
+        let buttonOffset = (screenWidth! - VCDimension.buttonWidth - VCDimension.interButton - VCDimension.buttonWidth) / 2
+        let buttonOffset2 = (screenWidth! - VCDimension.chBoxWidth - VCDimension.interButton - VCDimension.tlsLabWidth - VCDimension.interButton - VCDimension.buttonWidth) / 2
+        
+        // TODO: These cgrect's below should really be generated in a factory or just replaced with IB...
         
         // connect to RMS Server
-        tfURL = UITextField(frame: CGRect(x:inputOffset, y:topOffset+border, width:inputWidth, height:inputHeight))
+        tfURL = UITextField(frame:
+            CGRect(x: inputOffset,
+                   y: VCDimension.topOffset + VCDimension.border,
+                   width: VCDimension.inputWidth,
+                   height: VCDimension.inputHeight))
         tfURL!.borderStyle = .roundedRect
-        tfURL!.placeholder = "127.0.0.1:10001"
-        tfURL!.text = "172.20.10.5:10001"
-        //tfURL!.text = "172.20.10.5:10002"
+        tfURL!.placeholder = "\(IPv4.defaultAddr):\(IPv4.defaultPort)"
+        tfURL!.text = "\(IPv4.defaultAddr):\(IPv4.defaultPort)"
         tfURL!.backgroundColor = UIColor.white
         tfURL!.textColor = UIColor.blue
         
-        tfUser = UITextField(frame: CGRect(x:inputOffset, y:topOffset+2*border+inputHeight, width:inputWidth, height:inputHeight))
+        tfUser = UITextField(frame:
+            CGRect(x: inputOffset,
+                   y: VCDimension.topOffset + 2 * VCDimension.border + VCDimension.inputHeight,
+                   width: VCDimension.inputWidth,
+                   height: VCDimension.inputHeight))
         tfUser!.borderStyle = .roundedRect
         tfUser!.text = "OnityTech"
         tfUser!.placeholder = "user"
         tfUser!.backgroundColor = UIColor.white
         tfUser!.textColor = UIColor.blue
         
-        tfPwd = UITextField(frame: CGRect(x:inputOffset, y:topOffset+3*border+2*inputHeight, width:inputWidth, height:inputHeight))
+        tfPwd = UITextField(frame:
+            CGRect(x: inputOffset,
+                   y: VCDimension.topOffset + 3 * VCDimension.border + 2 * VCDimension.inputHeight,
+                   width: VCDimension.inputWidth,
+                   height: VCDimension.inputHeight))
         tfPwd!.borderStyle = .roundedRect
         tfPwd!.text = "password"
         tfPwd!.placeholder = "password"
@@ -272,7 +276,11 @@ class ViewController: UIViewController {
         tfPwd!.textColor = UIColor.blue
         tfPwd!.isSecureTextEntry = true
         
-        tfRoomId = UITextField(frame: CGRect(x:inputOffset, y:topOffset+4*border+3*inputHeight, width:inputWidth, height:inputHeight))
+        tfRoomId = UITextField(frame:
+            CGRect(x: inputOffset,
+                   y:  VCDimension.topOffset + 4 * VCDimension.border + 3 * VCDimension.inputHeight,
+                   width: VCDimension.inputWidth,
+                   height: VCDimension.inputHeight))
         tfRoomId!.borderStyle = .roundedRect
         tfRoomId!.text = "101"
         tfRoomId!.placeholder = "room id"
@@ -280,33 +288,53 @@ class ViewController: UIViewController {
         tfRoomId!.textColor = UIColor.blue
         
         
-        ckBox = UIButton(frame: CGRect(x:buttonOffset2, y:topOffset+4*border+4*inputHeight, width: chBoxWidth, height:inputHeight))
+        ckBox = UIButton(frame:
+            CGRect(x: buttonOffset2,
+                   y: VCDimension.topOffset + 4 * VCDimension.border + 4 * VCDimension.inputHeight,
+                   width: VCDimension.chBoxWidth,
+                   height: VCDimension.inputHeight))
         ckBox!.backgroundColor = .lightGray
         ckBox!.setTitleColor(.blue, for: .normal)
         displayChBox()
         ckBox!.addTarget(self, action: #selector(buttonCheck), for: .touchUpInside)
         
-        tlsLab = UIButton(frame: CGRect(x:buttonOffset2+chBoxWidth+interChk, y:topOffset+4*border+4*inputHeight, width: tlsLabWidth, height:inputHeight))
+        tlsLab = UIButton(frame:
+            CGRect(x: buttonOffset2 + VCDimension.chBoxWidth + VCDimension.interChk,
+                   y: VCDimension.topOffset + 4 * VCDimension.border + 4 * VCDimension.inputHeight,
+                   width: VCDimension.tlsLabWidth,
+                   height: VCDimension.inputHeight))
         tlsLab!.backgroundColor = .lightGray
         tlsLab!.setTitleColor(.blue, for: .normal)
         tlsLab!.setTitle("TLS", for: .normal)
         tlsLab!.addTarget(self, action: #selector(buttonCheck), for: .touchUpInside)
       
         
-        btConn = UIButton(frame: CGRect(x:buttonOffset2+chBoxWidth+interChk+tlsLabWidth+interButton, y:topOffset+4*border+4*inputHeight, width:buttonWidth, height:inputHeight))
+        btConn = UIButton(frame:
+            CGRect(x: buttonOffset2 + VCDimension.chBoxWidth + VCDimension.interChk + VCDimension.tlsLabWidth + VCDimension.interButton,
+                   y: VCDimension.topOffset + 4 * VCDimension.border + 4 * VCDimension.inputHeight,
+                   width: VCDimension.buttonWidth,
+                   height: VCDimension.inputHeight))
         btConn!.backgroundColor = .lightGray
         btConn!.setTitleColor(.blue, for: .normal)
         btConn!.setTitle("Connect", for: .normal)
         btConn!.addTarget(self, action: #selector(buttonConnect), for: .touchUpInside)
         
         
-        btPing = UIButton(frame: CGRect(x:buttonOffset, y:topOffset, width:buttonWidth, height:inputHeight))
+        btPing = UIButton(frame:
+            CGRect(x: buttonOffset,
+                   y: VCDimension.topOffset,
+                   width: VCDimension.buttonWidth,
+                   height: VCDimension.inputHeight))
         btPing!.backgroundColor = .lightGray
         btPing!.setTitleColor(.blue, for: .normal)
         btPing!.setTitle("Ping", for: .normal)
         btPing!.addTarget(self, action: #selector(buttonPing), for: .touchUpInside)
         
-        btDisconn = UIButton(frame: CGRect(x:buttonOffset+buttonWidth+interButton, y:topOffset, width:buttonWidth, height:inputHeight))
+        btDisconn = UIButton(frame:
+            CGRect(x: buttonOffset + VCDimension.buttonWidth + VCDimension.interButton,
+                   y: VCDimension.topOffset,
+                   width: VCDimension.buttonWidth,
+                   height: VCDimension.inputHeight))
         btDisconn!.backgroundColor = .lightGray
         btDisconn!.setTitleColor(.blue, for: .normal)
         btDisconn!.setTitle("Disconnect", for: .normal)
@@ -331,10 +359,13 @@ class ViewController: UIViewController {
         self.view.addSubview(tlsLab!)
         self.view.addSubview(btConn!)
         
-        let myY = topOffset+4*border+5*inputHeight
-        let myW = screenWidth!-2*border
-        let myH = screenHeight!-myY-bottomOffset
-        let myFrame = CGRect(x:border, y: myY, width: myW, height: myH)
+        let myY = VCDimension.topOffset + 4 * VCDimension.border + 5 * VCDimension.inputHeight
+        let myW = screenWidth! - 2 * VCDimension.border
+        let myH = screenHeight! - myY - VCDimension.bottomOffset
+        let myFrame = CGRect(x: VCDimension.border,
+                             y: myY,
+                             width: myW,
+                             height: myH)
         tView!.frame = myFrame
         self.view.addSubview(tView!)
     }
@@ -347,10 +378,13 @@ class ViewController: UIViewController {
         self.view.addSubview(btPing!)
         self.view.addSubview(btDisconn!)
         
-        let myY = topOffset+inputHeight
-        let myW = screenWidth!-2*border
-        let myH = screenHeight!-myY-bottomOffset
-        let myFrame = CGRect(x:border, y: myY, width: myW, height: myH)
+        let myY = VCDimension.topOffset + VCDimension.inputHeight
+        let myW = screenWidth! - 2 * VCDimension.border
+        let myH = screenHeight! - myY - VCDimension.bottomOffset
+        let myFrame = CGRect(x: VCDimension.border,
+                             y: myY,
+                             width: myW,
+                             height: myH)
         tView!.frame = myFrame
         self.view.addSubview(tView!)
     }
