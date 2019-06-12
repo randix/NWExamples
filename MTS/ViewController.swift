@@ -47,32 +47,52 @@ class ViewController: UIViewController {
     var tView: UITextView?
     
   
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loaditjjsfnrhng the view.
+    // MARK: - Functions
+    
+    /// Do any additional setup after loading the view.
+    private func decorateUI() {
         self.view.backgroundColor = .lightGray
+        
         let screenRect = UIScreen.main.bounds
         screenWidth = Int(screenRect.size.width)
         screenHeight = Int(screenRect.size.height)
-        print(screenWidth!, screenHeight!)
         
-        createSubviews()
-        displayConnect()
+        print(screenWidth!, screenHeight!)
     }
     
-    @objc func buttonConnect(sender: UIButton!) {
-       
+    /// This action is called when connect button tapped.
+    private func connectButtonAction() {
         if (useTls) {
             Log("Connecting (with TLS) ...")
         } else {
             Log("Connecting (no TLS) ...")
         }
         
-        client = MTSClient(log: Log, url: tfURL!.text!, mtsConnect: mtsConnect, mtsReceive: mtsReceive, mtsDisconnect: mtsDisconnect, mtsConvert: mtsConvertWait)
-        if (useTls) {
-            client!.withTLS(nil)
-        }
-        client!.connect()
+        client = MTSClient(log: Log,
+                           url: tfURL!.text!,
+                           mtsConnect: mtsConnect,
+                           mtsReceive: mtsReceive,
+                           mtsDisconnect: mtsDisconnect,
+                           mtsConvert: mtsConvertWait)
+        
+        if (useTls) { client?.withTLS(nil) }
+        client?.connect()
+    }
+
+    // MARK: - Functions: IBAction
+    
+    @objc func buttonConnect(sender: UIButton!) {
+        connectButtonAction()
+    }
+
+    // MARK: - Functions: UIViewController
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        decorateUI()
+        createSubviews()
+        displayConnect()
     }
     
     // called when the connection is established
