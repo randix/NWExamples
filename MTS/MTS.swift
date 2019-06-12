@@ -9,16 +9,16 @@ import Foundation
 import Network
 
 // helper functions
-func MTSconvert(_ from: MTSMessage) throws -> Data {
+public func MTSconvert(_ from: MTSMessage) throws -> Data {
     return try! JSONEncoder().encode(from)
 }
 
-func MTSconvert(_ from: Data) throws -> MTSMessage {
+public func MTSconvert(_ from: Data) throws -> MTSMessage {
     return try! JSONDecoder().decode(MTSMessage.self, from: from)
 }
 
 // primary message structure
-struct MTSMessage: Codable {
+public struct MTSMessage: Codable {
     var route: Int
     var jwt: String
     var data: Data
@@ -32,7 +32,7 @@ struct MTSMessage: Codable {
     }
 }
 
-class MTSServer {
+public class MTSServer {
     
     private let log: (_ log: String) -> Void
     public let port: UInt16
@@ -150,7 +150,7 @@ class MTSServer {
     }
 }
 
-class MTSClient {
+public class MTSClient {
     
     private let log: (_ log: String) -> Void
     public let host: String
