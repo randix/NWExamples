@@ -9,11 +9,11 @@ import Foundation
 import Network
 
 // helper functions
-public func MTSconvert(_ from: MTSMessage) throws -> Data {
+public func MTSConvert(_ from: MTSMessage) throws -> Data {
     return try! JSONEncoder().encode(from)
 }
 
-public func MTSconvert(_ from: Data) throws -> MTSMessage {
+public func MTSConvert(_ from: Data) throws -> MTSMessage {
     return try! JSONDecoder().decode(MTSMessage.self, from: from)
 }
 
@@ -338,7 +338,7 @@ public class MTSClient {
     
     func send(_ msg: MTSMessage) {
         log("send \(msg)")
-        let data = try! MTSconvert(msg)
+        let data = try! MTSConvert(msg)
         send(data)
     }
     
