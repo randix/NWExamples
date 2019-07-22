@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>ICanStateChange Protocol Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Protocol/ICanStateChange" class="dashAnchor"></a>
+    <a title="ICanStateChange Protocol Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html"> Docs</a> (100% documented)</p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html"> Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        ICanStateChange Protocol Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Protocols/ICanConvertFromMtsMessage.html">ICanConvertFromMtsMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ICanCreateTLSParams.html">ICanCreateTLSParams</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ICanLog.html">ICanLog</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ICanStateChange.html">ICanStateChange</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/IHasLog.html">IHasLog</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MTSClient.html">MTSClient</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MTSClientDelegate.html">MTSClientDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MTSRequest.html">MTSRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols.html#/s:9RandixMTS14MTSRequestTypeP">MTSRequestType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MTSServer.html">MTSServer</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Structs/MTSDataModel.html">MTSDataModel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/MTSMessage.html">MTSMessage</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS15LoggerReferencea">LoggerReference</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS13MTSConnectiona">MTSConnection</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS10MTSConverta">MTSConvert</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS13MTSDisconnecta">MTSDisconnect</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS10MTSReceivea">MTSReceive</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>ICanStateChange</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">ICanStateChange</span> <span class="p">:</span> <span class="kt">AnyObject</span><span class="p">,</span> <span class="kt"><a href="../Protocols/ICanLog.html">ICanLog</a></span><span class="p">,</span> <span class="kt"><a href="../Protocols/MTSClientDelegate.html">MTSClientDelegate</a></span></code></pre>
+
+                </div>
+              </div>
+            <p>Conforming types where Self: MTSClient, inherit the
+<code>stateDidChange:to</code> convenience method.</p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS15ICanStateChangePA2A9MTSClientRzrlE08stateDidE02toy7Network12NWConnectionC0D0O_tF"></a>
+                    <a name="//apple_ref/swift/Method/stateDidChange(to:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS15ICanStateChangePA2A9MTSClientRzrlE08stateDidE02toy7Network12NWConnectionC0D0O_tF">stateDidChange(to:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This convenience method logs state changes and updates
+self when connection is ready, firing off <code>mtsConnect</code>
+and updating <code>mtsModel.isConnected</code> boolean value.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">stateDidChange</span><span class="p">(</span><span class="n">to</span> <span class="nv">newState</span><span class="p">:</span> <span class="kt">NWConnection</span><span class="o">.</span><span class="kt">State</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>newState</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The NWConnection.State that
+                  connection has changed to.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2019 <a class="link" href="" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2019-07-22)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.10.0</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

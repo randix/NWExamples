@@ -1,0 +1,16 @@
+version: "Apple Swift version 5.0.1 (swiftlang-1001.0.82.4 clang-1001.0.46.5)"
+options: "ef957462ef2db294df30e070a1125d15"
+build_time: [1563822958, 300458000]
+inputs:
+  "/Users/utcmobiledev/Desktop/RandixMTS/RandixMTS/TypeAliases.swift": [9223372036, 854775807]
+  "/Users/utcmobiledev/Desktop/RandixMTS/RandixMTS/MTS/MTSRequest/MTSRequest.swift": [9223372036, 854775807]
+  "/Users/utcmobiledev/Desktop/RandixMTS/RandixMTS/MTS/MTSClient/MTSClientDelegate.swift": [9223372036, 854775807]
+  "/Users/utcmobiledev/Desktop/RandixMTS/RandixMTS/MTS/MTSClient/MTSClient.swift": [9223372036, 854775807]
+  "/Users/utcmobiledev/Desktop/RandixMTS/RandixMTS/MTS/MTSClient/ICanStateChange.swift": [9223372036, 854775807]
+  "/Users/utcmobiledev/Desktop/RandixMTS/RandixMTS/MTS/MTSDataModel.swift": [9223372036, 854775807]
+  "/Users/utcmobiledev/Desktop/RandixMTS/RandixMTS/MTS/MTSMessage.swift": [9223372036, 854775807]
+  "/Users/utcmobiledev/Desktop/RandixMTS/RandixMTS/ICanLog.swift": [9223372036, 854775807]
+  "/Users/utcmobiledev/Desktop/RandixMTS/RandixMTS/MTS/MTSClient/ICanCreateTLSParams.swift": [9223372036, 854775807]
+  "/Users/utcmobiledev/Desktop/RandixMTS/RandixMTS/MTS/MTSServer.swift": [9223372036, 854775807]
+  "/Users/utcmobiledev/Desktop/RandixMTS/RandixMTS/MTS/MTSRequest/MTSRequestType.swift": [9223372036, 854775807]
+  "/Users/utcmobiledev/Desktop/RandixMTS/RandixMTS/MTS/MTSRequest/ICanConvertFromMtsMessage.swift": [9223372036, 854775807]

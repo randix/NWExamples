@@ -1,0 +1,10 @@
+framework module RandixMTS {
+  umbrella header "RandixMTS.h"
+
+  export *
+  module * { export * }
+}
+
+module RandixMTS.__Swift {
+    exclude header "RandixMTS-Swift.h"
+}

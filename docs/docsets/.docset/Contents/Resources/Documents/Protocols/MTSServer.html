@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>MTSServer Protocol Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Protocol/MTSServer" class="dashAnchor"></a>
+    <a title="MTSServer Protocol Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html"> Docs</a> (100% documented)</p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html"> Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        MTSServer Protocol Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Protocols/ICanConvertFromMtsMessage.html">ICanConvertFromMtsMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ICanCreateTLSParams.html">ICanCreateTLSParams</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ICanLog.html">ICanLog</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ICanStateChange.html">ICanStateChange</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/IHasLog.html">IHasLog</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MTSClient.html">MTSClient</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MTSClientDelegate.html">MTSClientDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MTSRequest.html">MTSRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols.html#/s:9RandixMTS14MTSRequestTypeP">MTSRequestType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MTSServer.html">MTSServer</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Structs/MTSDataModel.html">MTSDataModel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/MTSMessage.html">MTSMessage</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS15LoggerReferencea">LoggerReference</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS13MTSConnectiona">MTSConnection</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS10MTSConverta">MTSConvert</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS13MTSDisconnecta">MTSDisconnect</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS10MTSReceivea">MTSReceive</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>MTSServer</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MTSServer</span> <span class="p">:</span> <span class="kt"><a href="../Protocols/ICanCreateTLSParams.html">ICanCreateTLSParams</a></span></code></pre>
+
+                </div>
+              </div>
+            <p>Conforming types can act as an MTS server that an MTS client
+can attempt to connect with using MTS transactions.</p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Properties"></a>
+                <a name="//apple_ref/swift/Section/Properties" class="dashAnchor"></a>
+                <a href="#/Properties">
+                  <h3 class="section-name">Properties</h3>
+                </a>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS9MTSServerP8mtsModelAA07MTSDataE0Vvp"></a>
+                    <a name="//apple_ref/swift/Property/mtsModel" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS9MTSServerP8mtsModelAA07MTSDataE0Vvp">mtsModel</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This property stores a reference to an MTSDataModel with
+appropriate cached values needed to interact with MTS
+transport layer.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">var</span> <span class="nv">mtsModel</span><span class="p">:</span> <span class="kt"><a href="../Structs/MTSDataModel.html">MTSDataModel</a></span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS9MTSServerP4ports6UInt16Vvp"></a>
+                    <a name="//apple_ref/swift/Property/port" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS9MTSServerP4ports6UInt16Vvp">port</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This property is equal to the port id that network
+connections will use.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">var</span> <span class="nv">port</span><span class="p">:</span> <span class="kt">UInt16</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS9MTSServerP18clientCertRequiredSbvp"></a>
+                    <a name="//apple_ref/swift/Property/clientCertRequired" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS9MTSServerP18clientCertRequiredSbvp">clientCertRequired</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This property is a boolean value that is true when TLS
+certificate is required for connection.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">var</span> <span class="nv">clientCertRequired</span><span class="p">:</span> <span class="kt">Bool</span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS9MTSServerP8listener7Network10NWListenerCSgvp"></a>
+                    <a name="//apple_ref/swift/Property/listener" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS9MTSServerP8listener7Network10NWListenerCSgvp">listener</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This is the network listener that will listen for
+connections.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">var</span> <span class="nv">listener</span><span class="p">:</span> <span class="kt">NWListener</span><span class="p">?</span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Functions"></a>
+                <a name="//apple_ref/swift/Section/Functions" class="dashAnchor"></a>
+                <a href="#/Functions">
+                  <h3 class="section-name">Functions</h3>
+                </a>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS9MTSServerP5startAaB_pyF"></a>
+                    <a name="//apple_ref/swift/Method/start()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS9MTSServerP5startAaB_pyF">start()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This method starts the server listening on its port.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">start</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">MTSServer</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A discardableResult of self as MTSServer.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS9MTSServerP13mtsDisconnectyyAA9MTSClient_pF"></a>
+                    <a name="//apple_ref/swift/Method/mtsDisconnect(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS9MTSServerP13mtsDisconnectyyAA9MTSClient_pF">mtsDisconnect(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This method disconnects specified client from server
+and performs any clean up required.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">mtsDisconnect</span><span class="p">(</span><span class="n">_</span> <span class="nv">client</span><span class="p">:</span> <span class="kt"><a href="../Protocols/MTSClient.html">MTSClient</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>client</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The specific MTSClient to be
+                disconnected.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS9MTSServerPAAE7withTLS11certificate25clientCertificateRequiredAaB_p10Foundation4DataVSg_SbtF"></a>
+                    <a name="//apple_ref/swift/Method/withTLS(certificate:clientCertificateRequired:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS9MTSServerPAAE7withTLS11certificate25clientCertificateRequiredAaB_p10Foundation4DataVSg_SbtF">withTLS(certificate:clientCertificateRequired:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This method uses passed arguments to configure connection
+for TLS using a certificate.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@discardableResult</span>
+<span class="k">mutating</span> <span class="kd">public</span> <span class="kd">func</span> <span class="nf">withTLS</span><span class="p">(</span><span class="nv">certificate</span><span class="p">:</span> <span class="kt">Data</span><span class="p">?,</span> <span class="nv">clientCertificateRequired</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">MTSServer</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>certificate</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The license to use for TLS config.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>clientCertificateRequired</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>When set to true,
+        this server instance will require TLS
+        certificate.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A discardableResult of self: MTSServer</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS9MTSServerPAAE4stopyyF"></a>
+                    <a name="//apple_ref/swift/Method/stop()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS9MTSServerPAAE4stopyyF">stop()</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This method ends MTS transactions and closes connection.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">stop</span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2019 <a class="link" href="" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2019-07-22)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.10.0</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

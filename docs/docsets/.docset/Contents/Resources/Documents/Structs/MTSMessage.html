@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>MTSMessage Structure Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Struct/MTSMessage" class="dashAnchor"></a>
+    <a title="MTSMessage Structure Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html"> Docs</a> (100% documented)</p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html"> Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        MTSMessage Structure Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Protocols/ICanConvertFromMtsMessage.html">ICanConvertFromMtsMessage</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ICanCreateTLSParams.html">ICanCreateTLSParams</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ICanLog.html">ICanLog</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ICanStateChange.html">ICanStateChange</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/IHasLog.html">IHasLog</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MTSClient.html">MTSClient</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MTSClientDelegate.html">MTSClientDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MTSRequest.html">MTSRequest</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols.html#/s:9RandixMTS14MTSRequestTypeP">MTSRequestType</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MTSServer.html">MTSServer</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Structs/MTSDataModel.html">MTSDataModel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/MTSMessage.html">MTSMessage</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS15LoggerReferencea">LoggerReference</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS13MTSConnectiona">MTSConnection</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS10MTSConverta">MTSConvert</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS13MTSDisconnecta">MTSDisconnect</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Typealiases.html#/s:9RandixMTS10MTSReceivea">MTSReceive</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>MTSMessage</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MTSMessage</span> <span class="p">:</span> <span class="kt">Codable</span></code></pre>
+
+                </div>
+              </div>
+            <p>This value type defines the MTS primary message structure.</p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS10MTSMessageV5routeSivp"></a>
+                    <a name="//apple_ref/swift/Property/route" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS10MTSMessageV5routeSivp">route</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This public property stores message route as an integer.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">route</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS10MTSMessageV3jwtSSvp"></a>
+                    <a name="//apple_ref/swift/Property/jwt" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS10MTSMessageV3jwtSSvp">jwt</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This public property stores JSON Web Token as a string.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">jwt</span><span class="p">:</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS10MTSMessageV4data10Foundation4DataVvp"></a>
+                    <a name="//apple_ref/swift/Property/data" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS10MTSMessageV4data10Foundation4DataVvp">data</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This public property stores messages content as data.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">data</span><span class="p">:</span> <span class="kt">Data</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS10MTSMessageV5replySbvp"></a>
+                    <a name="//apple_ref/swift/Property/reply" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS10MTSMessageV5replySbvp">reply</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This public property stores awknowledgement requirement.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">reply</span><span class="p">:</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS10MTSMessageV14attributeRouteSSSgvp"></a>
+                    <a name="//apple_ref/swift/Property/attributeRoute" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS10MTSMessageV14attributeRouteSSSgvp">attributeRoute</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>This optional public property stores attribute route.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">attributeRoute</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:9RandixMTS10MTSMessageV7request14attributeRoute3jwt4data5replyAcA10MTSRequest_p_SSSgSS10Foundation4DataVSbtcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(request:attributeRoute:jwt:data:reply:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:9RandixMTS10MTSMessageV7request14attributeRoute3jwt4data5replyAcA10MTSRequest_p_SSSgSS10Foundation4DataVSbtcfc">init(request:attributeRoute:jwt:data:reply:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">request</span><span class="p">:</span> <span class="kt"><a href="../Protocols/MTSRequest.html">MTSRequest</a></span><span class="p">,</span> <span class="nv">attributeRoute</span><span class="p">:</span> <span class="kt">String</span><span class="p">?,</span>
+     <span class="nv">jwt</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">data</span><span class="p">:</span> <span class="kt">Data</span><span class="p">,</span> <span class="nv">reply</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>request</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>MTSRequest type for MTS transaction.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>attributeRoute</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Optional attribute route path.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2019 <a class="link" href="" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2019-07-22)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.10.0</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

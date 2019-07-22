@@ -1,0 +1,11 @@
+framework module RandixMTS {
+  umbrella header "RandixMTS.h"
+
+  export *
+  module * { export * }
+}
+
+module RandixMTS.Swift {
+    header "RandixMTS-Swift.h"
+    requires objc
+}
