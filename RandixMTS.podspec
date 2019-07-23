@@ -1,11 +1,3 @@
-#
-#  Be sure to run `pod spec lint RandixMTS.podspec' to ensure this is a
-#  valid spec and to remove all comments including this before submitting the spec.
-#
-#  To learn more about Podspec attributes see http://docs.cocoapods.org/specification.html
-#  To see working Podspecs in the CocoaPods repo see https://github.com/CocoaPods/Specs/
-#
-
 Pod::Spec.new do |s|
 
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -31,7 +23,6 @@ The Randix Message Transfer Service is intended to serve as a working example of
   s.homepage     = "https://github.com/randix/NWExamples"
   # s.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
 
-
   # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
   #  Licensing your code is important. See http://choosealicense.com for more info.
@@ -39,7 +30,7 @@ The Randix Message Transfer Service is intended to serve as a working example of
   #  Popular ones are 'MIT', 'BSD' and 'Apache License, Version 2.0'.
   #
 
-  s.license      = "BSD 3 Clause"
+  s.license      = "BSD"
   # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
 
 
@@ -54,9 +45,9 @@ The Randix Message Transfer Service is intended to serve as a working example of
   #
 
   s.author             = { "Rand Dow" => "rand.dow@me.com" }
-  # Or just: s.author    = "James Lingo"
-  # s.authors            = { "James Lingo" => "james.lingo@fs.utc.com" }
-  # s.social_media_url   = "http://twitter.com/jalingo"
+  # Or just: s.author    = ""
+  # s.authors            = { "" => "jalingo@berkeley.edu" }
+  # s.social_media_url   = "http://twitter.com/"
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
@@ -64,7 +55,7 @@ The Randix Message Transfer Service is intended to serve as a working example of
   #  the deployment target. You can optionally include the target after the platform.
   #
 
-  s.platform     = :ios
+  s.platform     = :ios, "12.2"
   # s.platform     = :ios, "5.0"
 
   #  When using multiple platforms
@@ -91,8 +82,8 @@ The Randix Message Transfer Service is intended to serve as a working example of
   #  Not including the public_header_files will make all headers public.
   #
 
-  s.source_files  = ".", "RandixMTS", "RandixMTS/**/*.{h,m}"
-  s.exclude_files = "Classes/Exclude"
+  s.source_files  = "./*", "RandixMTS/*", "RandixMTS/**/*.{h,m}"
+  #  s.exclude_files = "Classes/Exclude"
 
   # s.public_header_files = "Classes/**/*.h"
 
